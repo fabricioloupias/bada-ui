@@ -12,6 +12,7 @@ import { ObjectId } from '@/utils'
 import { useBoundStore } from '../../store';
 import { Button } from '@/components/antd';
 import { registerNodes } from '@/lib/register-nodes';
+import { useRouter } from 'next/navigation';
 
 type EditorProps = {
     triggerId: string
@@ -298,6 +299,7 @@ const dialogsAux: any[] = [
 ]
 
 export default function Editor(props: EditorProps) {
+    const router = useRouter()
     const { triggerId } = props;
     const {
         addActionToSave,
@@ -334,8 +336,8 @@ export default function Editor(props: EditorProps) {
         return []
     }
 
-    const handleChange = (nodesChanged: INode[]) => {
-        console.log(nodesChanged)
+    const handleChange = (nodesChanged: INode[], event: string, nodeChanged?: INode) => {
+        console.log(nodeChanged)
         nodesChanged.forEach(node => {
             node.triggerId = triggerId;
         })
@@ -347,39 +349,6 @@ export default function Editor(props: EditorProps) {
         //     botAux.flow.dialogs[index] = dialog;
         //     // setBot(botAux)
     };
-
-    // const parseActionsToNodes = (actions: Action[]): INode[] => {
-    //     return actions.map(a => ({
-    //         ...a,
-    //         id: a._id.toString()
-    //     }))
-    // }
-
-    const onSelectMenuItem = ({ key }: any) => {
-        setIsLoadingFlow(true)
-
-        setIsLoadingFlow(false)
-    }
-
-    const exportFlow = () => {
-        let flow: any[] = [];
-        dialogs.forEach(d => {
-            let adaptive = {
-                ...d
-            }
-            adaptive.triggers = d.triggers.map((t: any) => {
-                let actions: any[] = [];
-                parseToActions(t.actions, actions);
-                return {
-                    ...t,
-                    actions
-                }
-            })
-            flow.push(adaptive)
-        })
-
-        console.log(flow)
-    }
 
     const onAddNodeSuccess = (type: string, node: INode) => {
         node = {
@@ -403,6 +372,11 @@ export default function Editor(props: EditorProps) {
 
     return (
         <>
+            <Button
+                onClick={() => router.back()}
+            >
+                Volver
+            </Button>
             <Button
                 disabled={!changesToSave}
                 onClick={onSaveActionsUnsaved}
