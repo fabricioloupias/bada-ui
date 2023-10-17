@@ -1,18 +1,25 @@
-import { ModelOptions, Severity, getModelForClass, mongoose, prop } from "@typegoose/typegoose";
+import { Types, Schema, model, models } from "mongoose";
 
-@ModelOptions({
-    schemaOptions: {
-        timestamps: true,
-        collection: "version-counter",
-    }
-})
-class VersionCounter {
-    _id: mongoose.Schema.Types.ObjectId
-    @prop()
+export interface VersionCounter {
+    _id: Types.ObjectId
     counter: number;
-    @prop()
-    botId: mongoose.Schema.Types.ObjectId;
+    botId: Types.ObjectId;
 }
 
-const VersionCounterModel = getModelForClass(VersionCounter);
-export { VersionCounterModel, VersionCounter };
+const versionCounterSchema = new Schema<VersionCounter>({
+    botId: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
+    counter: {
+        type: Number,
+        required: true
+    }
+}, {
+    collection: "version-counter",
+    timestamps: true
+})
+
+const VersionCounterModel = models.VersionCounter || model<VersionCounter>('VersionCounter', versionCounterSchema);
+
+export { VersionCounterModel };

@@ -1,7 +1,6 @@
 import connectDB from "@/lib/connect-db";
 import { AdaptiveDialog, AdaptiveDialogsModel } from "@/models/AdaptiveDialog";
 import { NextRequest, NextResponse } from "next/server";
-import { mongoose } from "@typegoose/typegoose";
 import { createErrorResponse } from "@/lib/utils";
 import { Trigger, TriggerModel } from "@/models/Trigger";
 import { Action, ActionModel } from "@/models/Action";

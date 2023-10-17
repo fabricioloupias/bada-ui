@@ -19,6 +19,7 @@ export interface ActionsSlice {
     onChangeAction: (action: INode) => void
     saveActionsUnsaved: (actions: INode[]) => void
     changesToSave: boolean
+    setChangesToSave: (changes: boolean) => void
 }
 
 export const createActionsSlice: StateCreator<
@@ -115,5 +116,8 @@ export const createActionsSlice: StateCreator<
         actionsToSave.push(action)
 
         set({ actionsToSave })
+    },
+    setChangesToSave: (changes: boolean) => {
+        set({ changesToSave: changes })
     }
 })

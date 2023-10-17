@@ -24,6 +24,7 @@ export default function Editor(props: EditorProps) {
     const {
         addActionToSave,
         changesToSave,
+        setChangesToSave,
         saveActionsUnsaved
     } = useBoundStore(state => state)
     const getActions = useBoundStore(state => state.getActions)
@@ -32,7 +33,7 @@ export default function Editor(props: EditorProps) {
     const [isLoadingFlow, setIsLoadingFlow] = useState<boolean>(true);
 
     const handleChange = (nodesChanged: INode[], event: string, nodeChanged?: INode) => {
-        console.log(nodeChanged)
+        setChangesToSave(true)
         nodesChanged.forEach(node => {
             node.triggerId = triggerId;
         })
@@ -57,7 +58,7 @@ export default function Editor(props: EditorProps) {
         saveActionsUnsaved(actions)
     }
 
-    if(isLoadingFlow){
+    if (isLoadingFlow) {
         return null
     }
 

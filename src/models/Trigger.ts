@@ -1,26 +1,33 @@
-import { ModelOptions, Severity, getModelForClass, mongoose, prop, Ref, PropType } from "@typegoose/typegoose";
+import { Document, Schema, Types, model, models } from "mongoose";
 import { Action } from "./Action";
 
-@ModelOptions({
-    schemaOptions: {
-        timestamps: true,
-        collection: "triggers",
-        strict: false
-    },
-    options: {
-        allowMixed: Severity.ALLOW,
-    },
-})
-class Trigger {
-    _id: mongoose.Schema.Types.ObjectId
-    @prop()
-    adaptiveDialogId: mongoose.Schema.Types.ObjectId
-    @prop()
+export interface Trigger extends Document {
+    adaptiveDialogId: Types.ObjectId
     $kind: string
-    @prop()
     intent?: string
     actions?: Action[]
 }
 
-const TriggerModel = getModelForClass(Trigger);
-export { TriggerModel, Trigger };
+const triggerSchema = new Schema<Trigger>({
+    adaptiveDialogId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'AdaptiveDialog'
+    },
+    $kind: {
+        type: String,
+        required: true
+    },
+    intent: {
+        type: String,
+        required: false
+    }
+}, {
+    strict: false,
+    collection: "triggers",
+    timestamps: true
+})
+
+const TriggerModel = models.Trigger || model<Trigger>('Trigger', triggerSchema);
+
+export { TriggerModel };

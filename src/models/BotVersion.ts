@@ -1,31 +1,45 @@
-import { Bot } from "./Bot";
-import mongoose from "mongoose";
-import * as typegoose from "@typegoose/typegoose";
-import { AdaptiveDialog } from "./AdaptiveDialog";
+import { Schema, Types, model, models, Document } from "mongoose";
 
-@typegoose.ModelOptions({
-    schemaOptions: {
-        timestamps: true,
-        collection: "bot-versions",
-    },
-})
-class BotVersion {
-    _id: mongoose.Schema.Types.ObjectId
-    @typegoose.prop({ ref: () => Bot })
-    bot: typegoose.Ref<Bot>
-    @typegoose.prop()
-    botId: mongoose.Schema.Types.ObjectId
-    @typegoose.prop()
+export interface BotVersion extends Document {
+    botId: Types.ObjectId
     publishedBy: string
-    @typegoose.prop()
     createdBy: string
-    @typegoose.prop()
-    publishedAt: string
-    @typegoose.prop()
+    publishedAt?: string
     version: number
-    @typegoose.prop()
     isDraft: boolean
 }
 
-const BotVersionModel = typegoose.getModelForClass(BotVersion);
-export { BotVersionModel, BotVersion };
+const botVersionSchema = new Schema<BotVersion>({
+    botId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'Bot'
+    },
+    publishedBy: {
+        type: String,
+        required: false
+    },
+    createdBy: {
+        type: String,
+        required: true
+    },
+    publishedAt: {
+        type: String,
+        required: false
+    },
+    version: {
+        type: Number,
+        required: true
+    },
+    isDraft: {
+        type: Boolean,
+        required: true
+    },
+}, {
+    collection: 'bot-versions',
+    timestamps: true
+})
+
+const BotVersionModel = models.BotVersion || model<BotVersion>('BotVersion', botVersionSchema,);
+
+export { BotVersionModel };

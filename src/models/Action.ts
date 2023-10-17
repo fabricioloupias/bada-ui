@@ -1,39 +1,59 @@
-import { ModelOptions, Severity, getModelForClass, mongoose, prop, Ref, PropType } from "@typegoose/typegoose"
+import { Schema, Types, model, models } from "mongoose"
 
-@ModelOptions({
-    schemaOptions: {
-        timestamps: true,
-        collection: "actions",
-        strict: false
-    },
-    options: {
-        allowMixed: Severity.ALLOW,
-    },
-})
-class Action {
-    _id?: mongoose.Schema.Types.ObjectId
-    @prop()
-    triggerId: mongoose.Schema.Types.ObjectId
-    @prop()
+export interface Action {
+    _id?: Types.ObjectId
+    triggerId: Types.ObjectId
     id: string
-    @prop()
-    $kind: string
-    @prop()
     type: string
-    @prop()
     name: string
-    @prop()
     data?: any
-    @prop()
     path: string[]
-    @prop()
     configuring?: boolean
-    @prop()
     validateStatusError?: boolean
-    @prop()
     next?: string[]
     [key: string]: any
 }
 
-const ActionModel = getModelForClass(Action)
-export { ActionModel, Action }
+const actionSchema = new Schema<Action>({
+    triggerId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'Trigger'
+    },
+    id: {
+        type: String,
+        required: true
+    },
+    type: {
+        type: String,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    data: {
+        type: Object,
+    },
+    path: {
+        type: [String],
+        required: true
+    },
+    configuring: {
+        type: Boolean,
+    },
+    validateStatusError: {
+        type: Boolean,
+    },
+    next: {
+        type: [String],
+    },
+}, {
+    strict: false,
+    collection: "actions",
+    timestamps: true
+});
+
+const ActionModel = models.Action || model<Action>('Action', actionSchema);
+
+export { ActionModel }

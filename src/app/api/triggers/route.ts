@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "../../../lib/connect-db";
 import { createErrorResponse } from "../../../lib/utils";
 import { TriggerModel } from "../../../models/Trigger";
-import { mongoose } from "@typegoose/typegoose";
 import { ActionModel } from "../../../models/Action";
 import { INode } from "react-flow-builder";
 import { v4 as uuidV4 } from "uuid";
+import mongoose from "mongoose";
 
 export type NewTriggerDTO = {
     adaptiveDialogId: string;
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json() as NewTriggerDTO
 
         const trigger = await TriggerModel.create({
-            adaptiveDialogId: new mongoose.mongo.ObjectId(body.adaptiveDialogId),
+            adaptiveDialogId: new mongoose.Types.ObjectId(body.adaptiveDialogId),
             $kind: body.$kind,
             intent: body.intent
         })

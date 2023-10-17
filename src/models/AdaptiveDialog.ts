@@ -1,27 +1,41 @@
-import { ModelOptions, Severity, getModelForClass, mongoose, prop } from "@typegoose/typegoose";
+import { Document, Schema, Types, model, models } from "mongoose";
 import { Trigger } from "./Trigger";
 
-@ModelOptions({
-    schemaOptions: {
-        timestamps: true,
-        collection: "adaptive-dialogs",
-    },
-    options: {
-        allowMixed: Severity.ALLOW,
-    },
-})
-class AdaptiveDialog {
-    _id?: mongoose.Schema.Types.ObjectId
-    @prop()
+
+export interface AdaptiveDialog extends Document {
+    _id: Types.ObjectId
     $kind: string
-    @prop()
     id: string
     triggers?: Trigger[]
-    @prop()
-    botVersionId: mongoose.Schema.Types.ObjectId
-    @prop()
-    recognizer: any //TODO: modificar el type
+    botVersionId: Types.ObjectId
+    recognizer?: any //TODO: modificar el type
 }
 
-const AdaptiveDialogsModel = getModelForClass(AdaptiveDialog);
-export { AdaptiveDialogsModel, AdaptiveDialog };
+//TODO: agregar pre save para validar que solo los Root tengan recognizer
+const adaptiveDialogSchema = new Schema<AdaptiveDialog>({
+    $kind: {
+        type: String,
+        required: true
+    },
+    id: {
+        type: String,
+        required: true
+    },
+    botVersionId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'BotVersion'
+    },
+    recognizer: {
+        type: Schema.Types.Mixed,
+        required: false
+    },
+}, {
+    strict: false,
+    collection: "adaptive-dialogs",
+    timestamps: true
+})
+
+const AdaptiveDialogsModel = models.AdaptiveDialog || model<AdaptiveDialog>('AdaptiveDialog', adaptiveDialogSchema);
+
+export { AdaptiveDialogsModel };

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createErrorResponse } from "../../../lib/utils";
 import connectDB from "../../../lib/connect-db";
-import { BotModel } from "../../../models/Bot";
-import { AdaptiveDialogsModel } from "../../../models/AdaptiveDialog";
-import { BotVersionModel } from "../../../models/BotVersion";
-import { VersionCounterModel } from "../../../models/VersionCounter";
-import { mongoose } from "@typegoose/typegoose";
+import { Bot, BotModel } from "../../../models/Bot";
+import { AdaptiveDialog, AdaptiveDialogsModel } from "../../../models/AdaptiveDialog";
+import { BotVersion, BotVersionModel } from "../../../models/BotVersion";
+import { VersionCounter, VersionCounterModel } from "../../../models/VersionCounter";
+import { HydratedDocument } from "mongoose";
 
 export async function GET(request: NextRequest) {
     try {
@@ -35,28 +35,41 @@ export async function GET(request: NextRequest) {
     }
 }
 
+
+// crear bot
 export async function POST(request: NextRequest) {
     try {
         await connectDB();
         const body = await request.json()
         body.owner = 'No identificado'
-        const newBot = await BotModel.create(body)
-        const botVersion = await BotVersionModel.create({
+        const newBot: HydratedDocument<Bot> = new BotModel(body)
+        await newBot.save()
+
+        const botVersion: HydratedDocument<BotVersion> = new BotVersionModel({
             version: 0,
             botId: newBot._id,
             publishedBy: "Sistema",
             createdBy: "Sistema",
             isDraft: true
         })
-        await VersionCounterModel.create({
+        await botVersion.save();
+
+        const versionCounter: HydratedDocument<VersionCounter> = new VersionCounterModel({
             botId: newBot._id,
             counter: 0
         })
-        await AdaptiveDialogsModel.create({
+        await versionCounter.save()
+
+        const adaptiveDialog: HydratedDocument<AdaptiveDialog> = new AdaptiveDialogsModel({
             botVersionId: botVersion._id,
             $kind: "Microsoft.AdaptiveDialog",
-            id: "Root"
+            id: "Root",
+            recognizer: {
+                $kind: "Bada.MCRecognizer",
+                intents: []
+            }
         })
+        await adaptiveDialog.save()
 
         let json_response = {
             status: "success",

@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createErrorResponse } from "../../../lib/utils";
 import connectDB from "../../../lib/connect-db";
 import { BotVersionModel } from "../../../models/BotVersion";
-import { mongoose } from "@typegoose/typegoose";
 import { VersionCounterModel } from "../../../models/VersionCounter";
 import { AdaptiveDialogsModel } from "../../../models/AdaptiveDialog";
+import mongoose from "mongoose";
 
 export async function GET(request: NextRequest) {
     try {
@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
         }
 
         const data = await BotVersionModel.find({
-            botId: new mongoose.mongo.ObjectId(botId)
-        }).skip(skip).limit(limit).lean().exec();
+            botId: new mongoose.Types.ObjectId(botId)
+        });
         const results = data.length;
 
         let json_response = {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json() as NewBotVersionDTO
 
         const versionCounter = await VersionCounterModel.findOne({
-            botId: new mongoose.mongo.ObjectId(body.botId)
+            botId: new mongoose.Types.ObjectId(body.botId)
         })
 
         if (versionCounter) {
@@ -74,11 +74,8 @@ export async function POST(request: NextRequest) {
                 id: "Root",
                 $kind: "Microsoft.AdaptiveDialog",
                 recognizer: {
-                    $kind: "Custom.MCRecognizer",
+                    $kind: "Bada.MCRecognizer",
                     intents: [
-                        {
-                            intent: "intent.common_greetings"
-                        }
                     ]
                 }
             })

@@ -37,7 +37,7 @@ export default function AddTriggerComponent({ setTriggerValue }: AddTriggerCompo
             </Form.Item>
             <Form.Item
                 name="intent"
-                label="Seleccionar disparador">
+                label="Intent id">
                 <Input placeholder="Intent" />
             </Form.Item>
             <Form.Item>

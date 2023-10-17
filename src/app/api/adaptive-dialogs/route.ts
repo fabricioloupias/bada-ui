@@ -2,24 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { createErrorResponse } from "../../../lib/utils";
 import connectDB from "../../../lib/connect-db";
 import { AdaptiveDialog, AdaptiveDialogsModel } from "../../../models/AdaptiveDialog";
-import { mongoose } from "@typegoose/typegoose";
 import { TriggerModel } from "../../../models/Trigger";
+import mongoose from "mongoose"
 
 export async function GET(request: NextRequest) {
     try {
         await connectDB();
 
         const botVersionId = request.nextUrl.searchParams.get("botVersionId");
-        
-        if(!botVersionId){
+
+        if (!botVersionId) {
             return NextResponse.json({
                 status: 'error',
                 message: "Faltan parametros"
             })
         }
 
-        const adaptiveDialogsModel = await AdaptiveDialogsModel.find({
-            botVersionId: new mongoose.mongo.ObjectId(botVersionId)
+        const adaptiveDialogsModel: AdaptiveDialog[] = await AdaptiveDialogsModel.find({
+            botVersionId: new mongoose.Types.ObjectId(botVersionId)
         })
 
         const triggerPromises = []

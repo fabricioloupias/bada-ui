@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "../../../lib/connect-db";
 import { createErrorResponse } from "../../../lib/utils";
 import { ActionModel } from "../../../models/Action";
-import { mongoose } from "@typegoose/typegoose";
+import mongoose from "mongoose";
 import { INode } from "react-flow-builder";
 
 // obtener actions por triggerId

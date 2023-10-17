@@ -26,7 +26,6 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
     const statusFetchingAdaptiveDialogs = useBoundStore((state) => state.statusFetchingAdaptiveDialogs)
     const saveTrigger = useBoundStore((state) => state.saveTrigger)
     const saveAdaptiveDialog = useBoundStore((state) => state.saveAdaptiveDialog)
-    const botVersionSelected = useBoundStore((state) => state.botVersionSelected)
     const [treeData, setTreeData] = useState<DataNode[]>([]);
     const [isModalTriggerOpen, setIsModalTriggerOpen] = useState(false);
     const [isModalTopicOpen, setIsModalTopicOpen] = useState(false);

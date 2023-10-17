@@ -1,23 +1,31 @@
-import { ModelOptions, Severity, getModelForClass, mongoose, prop } from "@typegoose/typegoose";
+import { Schema, Types, model, models } from "mongoose";
+import { AdaptiveDialog } from "./AdaptiveDialog";
 
-@ModelOptions({
-    schemaOptions: {
-        timestamps: true,
-        collection: "bots",
-    },
-    options: {
-        allowMixed: Severity.ALLOW,
-    },
-})
-class Bot {
-    _id: mongoose.Schema.Types.ObjectId
-    @prop()
+export interface Bot {
+    _id: Types.ObjectId
     type: string;
-    @prop()
     owner: string;
-    @prop()
     name: string;
 }
 
-const BotModel = getModelForClass(Bot);
-export { BotModel, Bot };
+const botSchema = new Schema<Bot>({
+    type: {
+        type: String,
+        required: true
+    },
+    owner: {
+        type: String,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+}, {
+    collection: "bots",
+    timestamps: true
+})
+
+const BotModel = models.Bot || model<Bot>('Bot', botSchema);
+
+export { BotModel };
