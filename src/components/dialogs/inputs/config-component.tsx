@@ -23,7 +23,6 @@ const ChoiceInputConfig = (props: IConfigComponent) => {
                 value: c.value
             }
         }))
-        console.log('Received values of form:', values);
         save?.(values, false);
     };
 

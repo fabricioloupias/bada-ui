@@ -101,7 +101,6 @@ export const createActionsSlice: StateCreator<
         const actionsToSave = get().actionsToSave
         actionsToSave.push(action)
 
-        console.log('actionsToSave', actionsToSave)
         set({ actionsToSave })
         set({ changesToSave: true })
     },

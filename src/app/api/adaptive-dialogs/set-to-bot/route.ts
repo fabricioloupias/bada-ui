@@ -5,7 +5,7 @@ import { createErrorResponse } from "@/lib/utils";
 import { Trigger, TriggerModel } from "@/models/Trigger";
 import { Action, ActionModel } from "@/models/Action";
 import { parseToActions } from "@/utils";
-import { FlattenMaps } from "mongoose";
+import mongoose, { FlattenMaps } from "mongoose";
 import axios from "axios";
 
 type SetToBotDTO = {
@@ -16,8 +16,8 @@ export async function POST(request: NextRequest) {
     try {
         await connectDB();
         const body = await request.json() as SetToBotDTO
-        const _ids = body.adaptiveDialogIds.map(id => new mongoose.mongo.ObjectId(id))
-        const adaptiveDialogs = await AdaptiveDialogsModel.find({
+        const _ids = body.adaptiveDialogIds.map(id => new mongoose.Types.ObjectId(id))
+        const adaptiveDialogs: AdaptiveDialog[] = await AdaptiveDialogsModel.find({
             _id: _ids
         })
 
@@ -33,16 +33,15 @@ export async function POST(request: NextRequest) {
 
         const toBot: AdaptiveDialog[] = []
         adaptiveDialogs.forEach(adaptiveDialog => {
-            let adaptive = adaptiveDialog.toJSON();
+            let adaptive = adaptiveDialog.toJSON() as AdaptiveDialog;
             adaptive.triggers = []
-            console.log('triggers', triggers)
             const triggersByAdaptiveDialogId = triggers.filter(t => t.adaptiveDialogId.toString() === adaptiveDialog._id.toString()) as FlattenMaps<Trigger>[]
             adaptive.triggers = JSON.parse(JSON.stringify(triggersByAdaptiveDialogId)) as FlattenMaps<Trigger>[]
-            let triggersCopy: mongoose.FlattenMaps<Trigger>[] = []
+            let triggersCopy: Trigger[] = []
             adaptive.triggers.forEach(trigger => {
                 let newTrigger = {
                     ...trigger
-                }
+                } as Trigger
                 const actionsToParse = actions.filter(a => a.triggerId.toString() === newTrigger._id.toString())
                 const actionsParsed: Action[] = []
                 parseToActions(actionsToParse, actionsParsed)

@@ -16,7 +16,6 @@ export default function AddTriggerComponent({ setTriggerValue }: AddTriggerCompo
 
 
     const onFinish = (values: NewTrigger) => {
-        console.log(values)
         setTriggerValue(values)
     };
 

@@ -22,14 +22,12 @@ export default function BotsActions() {
             })
 
             const data = await response.json();
-            console.log(data)
         } catch (error) {
             console.error(error)
         }
     };
 
     const handleCancel = () => {
-        console.log('Clicked cancel button');
         setOpen(false);
     };
 

@@ -3,7 +3,7 @@ import { BuilderContext, IConfigComponent, useDrawer } from 'react-flow-builder'
 import { Form, Button, Input } from 'antd';
 import { EndNode } from '.';
 
-const EndConfig = (props: IConfigComponent) => {
+export const EndConfig = (props: IConfigComponent) => {
     const { selectedNode: node } = useContext(BuilderContext);
     const { closeDrawer: cancel, saveDrawer: save } = useDrawer();
 
@@ -47,5 +47,3 @@ const EndConfig = (props: IConfigComponent) => {
         </Form>
     </>
 };
-
-export { EndConfig };
