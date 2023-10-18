@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import type { DataNode } from 'antd/es/tree';
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
@@ -38,6 +38,7 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
     const [isModalTopic, setIsModalTopic] = useState<boolean>(false)
     const [isModalTrigger, setIsModalTrigger] = useState<boolean>(false)
     const [adaptiveDialogIdToModal, setAdaptiveDialogIdToModal] = useState<string>("")
+    const [expandedKeys, setExpandedKeys] = useState<string[]>([])
 
     const formatTrigger = (trigger: ITrigger) => {
         switch (trigger.$kind) {
@@ -89,53 +90,73 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
     }
 
     const getTreeData = (adaptiveDialogs: IAdaptiveDialog[]) => {
-        if (adaptiveDialogs.length > 0) {
-            const data = adaptiveDialogs.map((adaptiveDialog, index) => {
-                adaptiveDialog.triggers = adaptiveDialog.triggers ?? [];
-                const children = adaptiveDialog.triggers.map((t, indexC: number) => {
-                    return {
-                        key: `${index}-${index}-${indexC}`,
-                        title: <Link href={`editor/${t._id}`}>{formatTrigger(t)}</Link>,
-                        icon: <Flash16Regular />
-                    }
-                })
-                children.push({
-                    key: uuidv4(),
-                    title: <Button
-                        size="small"
-                        onClick={() => showModalToTrigger(adaptiveDialog._id!)}
-                    >
-                        Agregar disparador
-                    </Button>,
-                    icon: <Flash16Regular />
-                })
+        const expandedKeys = []
+        let mainIndex = 0
+        let countAdaptiveIndex = 0
+
+        const data = adaptiveDialogs.map((adaptiveDialog, index) => {
+            countAdaptiveIndex = index
+            adaptiveDialog.triggers = adaptiveDialog.triggers ?? [];
+            let countIndex = 0
+            const children = adaptiveDialog.triggers.map((t, indexC: number) => {
+                countIndex = indexC
+                const key = `${mainIndex}-${index}-${indexC}`
+                expandedKeys.push(key)
                 return {
-                    key: `${index}-${index}`,
-                    title: adaptiveDialog.id,
-                    icon: <CarryOutOutlined />,
-                    children
+                    key,
+                    title: <Link href={`editor/${t._id}`}>{formatTrigger(t)}</Link>,
+                    icon: <Flash16Regular />
                 }
-
-            }) as DataNode[]
-
-            data.push({
-                key: uuidv4(),
-                title: (<Button
-                    size="small"
-                    onClick={() => showModalToTopic()}
-                >
-                    Agregar tema
-                </Button>),
-                icon: <CarryOutOutlined />,
-                children: []
             })
-            return data
-        }
+            countIndex++
+            const key = `${mainIndex}-${index}-${countIndex}`
+            expandedKeys.push(key)
+            children.push({
+                key,
+                title: <Button
+                    size="small"
+                    onClick={() => showModalToTrigger(adaptiveDialog._id!)}
+                >
+                    Agregar disparador
+                </Button>,
+                icon: <Flash16Regular />
+            })
+            expandedKeys.push(`${mainIndex}-${index}`)
+            return {
+                key: `${mainIndex}-${index}`,
+                title: adaptiveDialog.id,
+                icon: <CarryOutOutlined />,
+                children
+            }
+
+        }) as DataNode[]
+        countAdaptiveIndex++
+
+        expandedKeys.push(`${mainIndex}-${countAdaptiveIndex}`)
+        data.push({
+            key: `${mainIndex}-${countAdaptiveIndex}`,
+            title: (<Button
+                size="small"
+                onClick={() => showModalToTopic()}
+            >
+                Agregar tema
+            </Button>),
+            icon: <CarryOutOutlined />,
+            children: []
+        })
+        setExpandedKeys(expandedKeys)
+        console.log(data)
+        setTreeData([...data])
     }
 
     useEffect(() => {
         getAdaptiveDialogs(botVersionId)
-    }, [botVersionId, getAdaptiveDialogs])
+    }, [botVersionId, getAdaptiveDialogs,])
+
+
+    useEffect(() => {
+        getTreeData(deepAdaptiveDialogs)
+    }, [deepAdaptiveDialogs])
 
     const addTrigger = async (dialogId: string, triggerValue: NewTrigger) => {
         const newTrigger = {
@@ -178,12 +199,14 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
             </>
         )
     }
+
     return (
         <>
             <Tree
                 showLine
                 defaultExpandAll
-                treeData={getTreeData(deepAdaptiveDialogs)}
+                expandedKeys={expandedKeys}
+                treeData={treeData}
             />
             <Modal
                 title={modalTitle}
