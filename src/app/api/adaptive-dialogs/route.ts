@@ -53,6 +53,7 @@ export type NewAdaptiveDialogDTO = {
     botVersionId: string,
     id: string
 }
+
 // crear adaptive dialog para adaptive dialog Id
 export async function POST(request: NextRequest) {
     try {
@@ -64,6 +65,29 @@ export async function POST(request: NextRequest) {
             $kind: "Microsoft.AdaptiveDialog",
             id: body.id
         })
+
+        const json_response = {
+            status: "success",
+            adaptive_dialog: adaptiveDialog,
+        };
+
+        return NextResponse.json(json_response);
+    } catch (error: any) {
+        return createErrorResponse(error.message, 500);
+    }
+}
+
+export type UpdateAdaptiveDialogDTO = {
+    adaptiveDialog: AdaptiveDialog,
+}
+
+// Actualizar adaptive dialog
+export async function PUT(request: NextRequest) {
+    try {
+        await connectDB();
+        const body = await request.json() as UpdateAdaptiveDialogDTO
+
+        const adaptiveDialog = await AdaptiveDialogsModel.findByIdAndUpdate(body.adaptiveDialog._id, body.adaptiveDialog)
 
         const json_response = {
             status: "success",

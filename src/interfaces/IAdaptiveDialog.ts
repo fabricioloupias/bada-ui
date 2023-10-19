@@ -6,4 +6,13 @@ export interface IAdaptiveDialog {
     triggers?: ITrigger[]
     id: string
     botVersionId: string
+    recognizer?: IBadaRecognizer
+}
+
+export interface IRecognizer {
+    $kind: string
+}
+
+export interface IBadaRecognizer extends IRecognizer {
+    intents: string[]
 }

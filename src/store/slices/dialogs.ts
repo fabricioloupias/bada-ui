@@ -14,6 +14,7 @@ export interface DialogSlice {
     setDeepAdaptiveDialogs: (adaptiveDialogs: IAdaptiveDialog[]) => void
     saveAdaptiveDialog: (newAdaptiveDialogDTO: NewAdaptiveDialogDTO) => Promise<IAdaptiveDialog>;
     setAdaptiveDialogsOnBot: () => Promise<void>
+    updateAdaptiveDialog: (adaptiveDialog: IAdaptiveDialog) => Promise<void>
 }
 
 export const createDialoglice: StateCreator<
@@ -83,6 +84,17 @@ export const createDialoglice: StateCreator<
             method: 'POST',
             body: JSON.stringify({
                 adaptiveDialogIds
+            })
+        })
+
+        const data = await response.json()
+        return data.adaptive_dialog
+    },
+    updateAdaptiveDialog: async (adaptiveDialog: IAdaptiveDialog) => {
+        const response = await fetch('/api/adaptive-dialogs', {
+            method: 'PUT',
+            body: JSON.stringify({
+                adaptiveDialog
             })
         })
 
