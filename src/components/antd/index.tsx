@@ -5,13 +5,15 @@ export { Home20Regular, DocumentData20Regular, DataTrending20Regular, Flash16Reg
 export { CarryOutOutlined, EditOutlined } from "@ant-design/icons";
 
 const { Content, Header, Sider } = Layout;
-const { Title } = Typography;
+const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 export {
     Layout,
     Content,
     Header,
+    Paragraph,
+    Text,
     Sider,
     Title,
     RangePicker
