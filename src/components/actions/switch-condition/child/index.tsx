@@ -7,4 +7,5 @@ export const SwitchConditionChildNode: IRegisterNode = {
     name: "Caso valor",
     displayComponent: SwitchConditionChildDisplay,
     configComponent: SwitchConditionChildConfig,
+    showPracticalBranchRemove: true,
 }

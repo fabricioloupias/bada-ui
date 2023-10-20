@@ -6,4 +6,5 @@ export const IfConditionChildNode: IRegisterNode = {
     type: 'IfConditionChild',
     name: "Condición",
     displayComponent: IfConditionChildDisplay,
+    customRemove: true
 }
