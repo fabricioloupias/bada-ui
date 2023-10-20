@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createErrorResponse } from "@/lib/utils";
 import { Trigger, TriggerModel } from "@/models/Trigger";
 import { Action, ActionModel } from "@/models/Action";
-import { parseToActions } from "@/utils";
+import { parseToActions, setByPath } from "@/utils";
 import mongoose, { FlattenMaps } from "mongoose";
 import axios from "axios";
 
@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
             adaptiveDialogId: _ids
         })
 
+
         const _triggerIds = triggers.map(trigger => trigger._id)
 
         const actions = await ActionModel.find({
@@ -43,15 +44,20 @@ export async function POST(request: NextRequest) {
                     ...trigger
                 } as Trigger
                 const actionsToParse = actions.filter(a => a.triggerId.toString() === newTrigger._id.toString())
+
+                const treeNodes: Action[] = []
+                actionsToParse.forEach(a => {
+                    setByPath(treeNodes, a.path!.join("."), a)
+                })
+
                 const actionsParsed: Action[] = []
-                parseToActions(actionsToParse, actionsParsed)
-                newTrigger.actions = actionsParsed as FlattenMaps<Action>[]
+                parseToActions(treeNodes, actionsParsed)
+                newTrigger.actions = actionsParsed
                 triggersCopy.push(newTrigger)
             })
             adaptive.triggers = triggersCopy
             toBot.push(adaptive)
         })
-
         const response = await axios.post('http://192.168.0.243:3978/api/publish', {
             dialogs: toBot
         })
