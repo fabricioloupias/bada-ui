@@ -17,6 +17,9 @@ export const parseToActions = (nodes: any, actions: any[]) => {
             if (n.type == "Microsoft.HttpRequest") {
                 actions.push(n.data)
             }
+            if (n.type == "Microsoft.CancelAllDialogs") {
+                actions.push(n.data)
+            }
 
             if (n.type == "Microsoft.IfCondition") {
                 const action = n.data
