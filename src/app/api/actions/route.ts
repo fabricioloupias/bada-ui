@@ -33,12 +33,14 @@ export async function GET(request: NextRequest) {
     }
 }
 
+// guardar acciones y eliminar las que dejan de exisitr
 interface ActionDTO extends INode {
     triggerId: string,
     _id?: string
 }
 type NewActionsDTO = {
-    actionsToSave: ActionDTO[]
+    actionsToSave: ActionDTO[],
+    actionIdsToDelete: string[]
 }
 export async function POST(request: NextRequest) {
     try {
@@ -46,7 +48,17 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json() as NewActionsDTO
 
-        //TODO: tener en cuenta que cambia todo el arbol
+        if (body.actionIdsToDelete.length > 0) {
+            const objectIds = body.actionIdsToDelete.map(aId => new mongoose.mongo.ObjectId(aId));
+            await ActionModel.deleteMany(
+                {
+                    _id: {
+                        $in: objectIds
+                    }
+                }
+            )
+        }
+
         await Promise.all(body.actionsToSave.map(actionToSave => {
             if (actionToSave._id) {
                 return ActionModel.findByIdAndUpdate(new mongoose.mongo.ObjectId(actionToSave._id), {

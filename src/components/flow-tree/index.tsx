@@ -2,15 +2,14 @@
 import { Key, useEffect, useState } from "react";
 import type { DataNode, EventDataNode } from 'antd/es/tree';
 import Link from "next/link";
-import { v4 as uuidv4 } from 'uuid';
 import AddTriggerComponent from "@/components/add-trigger";
 import { Button, CarryOutOutlined, EditOutlined, Flash16Regular, Form, Input, Modal, Space, Title, Tree } from "@/components/antd";
 import { useBoundStore } from "@/store";
 import AddTopicComponent from "../add-topic";
 import { IAdaptiveDialog } from "../../interfaces/IAdaptiveDialog";
 import { ITrigger } from "@/interfaces/ITrigger";
-import node from "postcss/lib/node";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Delete16Regular } from "@fluentui/react-icons";
 
 type FlowTreeProps = {
     botVersionId: string
@@ -118,7 +117,12 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                     expandedKeys.push(key)
                     return {
                         key,
-                        title: <Link href={`editor/${t._id}`}>{formatTrigger(t)}</Link>,
+                        title:
+                            <Space align="center">
+                                <Link href={`editor/${t._id}`}>{formatTrigger(t)}</Link>
+                                <Delete16Regular />
+                            </Space>
+                        ,
                         icon: <Flash16Regular />
                     }
                 })
@@ -175,7 +179,6 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                 children: []
             })
             setExpandedKeys(expandedKeys)
-            console.log(data)
             setTreeData([...data])
         }
     }

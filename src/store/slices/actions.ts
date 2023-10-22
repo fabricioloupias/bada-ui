@@ -2,24 +2,21 @@ import { StateCreator } from "zustand"
 import { BoundStoreType } from ".."
 import { setByPath } from "../../utils"
 import { INode } from "react-flow-builder"
-import { IAction } from "../../interfaces/IAction"
 import * as uuid from 'uuid';
 
 export interface ActionsSlice {
     actions: INode[],
-    actionsToSave: INode[]
-    actionsToUpdate: INode[]
+    actionsToDelete: INode[]
     statusFetchingFlows: {
         isLoading: boolean
         isError: boolean
     },
     getActions: ({ triggerId }: { triggerId: string }) => Promise<void>
-    addActionToSave: (action: INode) => void
-    addActionToUpdate: (action: INode) => void
-    onChangeAction: (action: INode) => void
-    saveActionsUnsaved: (actions: INode[]) => void
+    saveActions: (actions: INode[], actionsToDelete: INode[]) => void
     changesToSave: boolean
     setChangesToSave: (changes: boolean) => void
+    setActions: (actions: INode[]) => void
+    addActionToDelete: (action: INode) => void
 }
 
 export const createActionsSlice: StateCreator<
@@ -31,25 +28,31 @@ export const createActionsSlice: StateCreator<
     changesToSave: false,
     actions: [],
     actionsSaved: [],
-    actionsToSave: [],
-    actionsToUpdate: [],
+    actionsToDelete: [],
     statusFetchingFlows: {
         isLoading: false,
         isError: false
     },
-    saveActionsUnsaved: async (actions: INode[]) => {
+    saveActions: async (actions: INode[], actionsToDelete: INode[]) => {
+        let actionIdsToDelete: string[] = []
+        actionsToDelete.forEach(a => {
+            if (a._id)
+                actionIdsToDelete.push(a._id)
+        })
+        
         try {
             const response = await fetch(`/api/actions`, {
                 method: 'POST',
                 body: JSON.stringify({
-                    actionsToSave: actions
+                    actionsToSave: actions,
+                    actionIdsToDelete
                 })
             })
 
             const json = await response.json();
             return json
         } catch (error) {
-            console.error('saveActionsUnsaved', error)
+            console.error('saveActions', error)
         }
     },
     getActions: async ({ triggerId }) => {
@@ -72,7 +75,7 @@ export const createActionsSlice: StateCreator<
             })
             try {
                 const response = await fetch(`/api/actions?triggerId=${triggerId}`)
-                const json = await response.json() as { actions: IAction[] }
+                const json = await response.json() as { actions: INode[] }
 
                 set({
                     statusFetchingFlows: {
@@ -97,26 +100,15 @@ export const createActionsSlice: StateCreator<
             }
         }
     },
-    addActionToSave: (action: INode) => {
-        const actionsToSave = get().actionsToSave
-        actionsToSave.push(action)
-
-        set({ actionsToSave })
-        set({ changesToSave: true })
-    },
-    addActionToUpdate: (action: INode) => {
-        const actionsToSave = get().actionsToSave
-        actionsToSave.push(action)
-
-        set({ actionsToSave })
-    },
-    onChangeAction: (action: INode) => {
-        const actionsToSave = get().actionsToSave
-        actionsToSave.push(action)
-
-        set({ actionsToSave })
-    },
     setChangesToSave: (changes: boolean) => {
         set({ changesToSave: changes })
+    },
+    setActions: (actions: INode[]) => {
+        set({ actions })
+    },
+    addActionToDelete: (action: INode) => {
+        const actionsToDelete = get().actionsToDelete;
+        actionsToDelete.push(action)
+        set({ actionsToDelete })
     }
 })

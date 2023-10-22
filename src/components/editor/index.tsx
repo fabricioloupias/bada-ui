@@ -22,31 +22,25 @@ export default function Editor(props: EditorProps) {
     const router = useRouter()
     const { triggerId } = props;
     const {
-        addActionToSave,
         changesToSave,
         setChangesToSave,
-        saveActionsUnsaved
+        saveActions,
+        setActions,
+        addActionToDelete,
+        actionsToDelete
     } = useBoundStore(state => state)
     const getActions = useBoundStore(state => state.getActions)
     const actions = useBoundStore(state => state.actions)
-    const [nodes, setNodes] = useState<INode[]>([]);
     const [isLoadingFlow, setIsLoadingFlow] = useState<boolean>(true);
 
     const handleChange = (nodesChanged: INode[], event: string, nodeChanged?: INode) => {
+        console.log(nodesChanged)
         setChangesToSave(true)
         nodesChanged.forEach(node => {
             node.triggerId = triggerId;
         })
-        setNodes(nodesChanged);
+        setActions(nodesChanged);
     };
-
-    const onAddNodeSuccess = (type: string, node: INode) => {
-        node = {
-            ...node,
-            triggerId
-        }
-        addActionToSave(node)
-    }
 
     useEffect(() => {
         setIsLoadingFlow(true)
@@ -54,8 +48,12 @@ export default function Editor(props: EditorProps) {
         setIsLoadingFlow(false)
     }, [getActions, triggerId])
 
-    const onSaveActionsUnsaved = () => {
-        saveActionsUnsaved(actions)
+    const onSaveActions = () => {
+        saveActions(actions, actionsToDelete)
+    }
+
+    const onRemoveNodeSuccess = (node: INode) => {
+        addActionToDelete(node)
     }
 
     if (isLoadingFlow) {
@@ -72,7 +70,7 @@ export default function Editor(props: EditorProps) {
                 </Button>
                 <Button
                     disabled={!changesToSave}
-                    onClick={onSaveActionsUnsaved}
+                    onClick={onSaveActions}
                 >
                     Guardar
                 </Button>
@@ -81,7 +79,7 @@ export default function Editor(props: EditorProps) {
                     zoomTool
                     onChange={handleChange}
                     historyTool
-                    onAddNodeSuccess={onAddNodeSuccess}
+                    onRemoveNodeSuccess={onRemoveNodeSuccess}
                     showArrow
                     createUuid={() => ObjectId()}
                     registerNodes={registerNodes}
