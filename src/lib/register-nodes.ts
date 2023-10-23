@@ -7,12 +7,14 @@ import { SendActivityNode } from "@/components/actions/send-activity";
 import { SetPropertyNode } from "@/components/actions/set-property";
 import { SwitchConditionNode } from "@/components/actions/switch-condition";
 import { SwitchConditionChildNode } from "@/components/actions/switch-condition/child";
-import { ChoiceInputNode } from "@/components/dialogs/inputs";
+import { ChoiceInputNode } from "@/components/dialogs/inputs/choice";
+import { TextInputNode } from "@/components/dialogs/inputs/text";
 import { EndNode } from "@/components/nodes/end";
 import { OnBeginDialogNode } from "@/components/triggers/on-begin-dialog";
 import { OnIntentNode } from "@/components/triggers/on-intent";
 import { IRegisterNode } from "react-flow-builder";
 
+// registro de tipos de nodos, agregar a la lista para el renderizado en el componente Editor
 export const registerNodes: IRegisterNode[] = [
     OnBeginDialogNode,
     OnIntentNode,
@@ -26,5 +28,6 @@ export const registerNodes: IRegisterNode[] = [
     SetPropertyNode,
     BeginDialogNode,
     EndNode,
-    CancelAllDialogsNode
+    TextInputNode,
+    CancelAllDialogsNode,
 ];

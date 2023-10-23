@@ -15,12 +15,13 @@ const HttpRequestConfig = (props: IConfigComponent) => {
         values.$kind = HttpRequestNode.type
         let headers: { [key: string]: string } = {}
 
-        values.headers.map((h: { key: string, value: string }) => {
-            headers[h.key] = h.value
-        })
+        if (values.headers) {
+            values.headers.map((h: { key: string, value: string }) => {
+                headers[h.key] = h.value
+            })
+        }
 
         values.headers = headers
- 
         save?.(values, false);
     };
 

@@ -161,7 +161,7 @@ const ChoiceInputConfig = (props: IConfigComponent) => {
                     type="primary"
                     htmlType="submit"
                 >
-                    Submit
+                    Guardar
                 </Button>
             </Form.Item>
         </Form>

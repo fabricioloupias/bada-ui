@@ -6,7 +6,7 @@ import { Key24Regular } from "@fluentui/react-icons";
 export const primaryColor = '#da3b01'
 
 export const EndNode: IRegisterNode = {
-    type: 'Bada.End',
+    type: 'Node.End',
     name: "Cierre",
     displayComponent: EndDisplay,
     configComponent: EndConfig,

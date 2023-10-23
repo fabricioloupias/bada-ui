@@ -59,7 +59,7 @@ const generateActions = ($kind: string): INode[] => {
         })
         actions.push({
             "id": uuidV4(),
-            "type": "Bada.End",
+            "type": "Node.End",
             name: "final",
             "path": [
                 "1"
@@ -78,7 +78,7 @@ const generateActions = ($kind: string): INode[] => {
         })
         actions.push({
             "id": uuidV4(),
-            "type": "Bada.End",
+            "type": "Node.End",
             "name": "final",
             "path": [
                 "1"

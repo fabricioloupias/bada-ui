@@ -6,7 +6,7 @@ import { PictureInPictureEnter24Regular } from "@fluentui/react-icons";
 export const primaryColor = '#5c2d91'
 
 export const BeginDialogNode: IRegisterNode = {
-    type: 'Microsoft.BeginDialog',
+    type: 'Node.Begin',
     name: "Ir a",
     displayComponent: BeginDialogDisplay,
     configComponent: BeginDialogConfig,
