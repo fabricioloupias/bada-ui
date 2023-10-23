@@ -1,7 +1,7 @@
-import { IAction } from "@/interfaces/IAction"
+import { Action } from "@/models/Action"
 
-export const parseToActions = (nodes: IAction[], actions: IAction[]) => {
-    nodes.forEach((n: IAction) => {
+export const parseToActions = (nodes: Action[], actions: Action[]) => {
+    nodes.forEach((n: Action) => {
         if (n.type !== "Node.Begin" && n.type !== "Node.End") {
             if (n.data) {
                 if (n.type == "Microsoft.IfCondition") {
