@@ -3,7 +3,6 @@ import { RangePicker, Table, Tabs, Title } from "@/components/antd"
 import { Button, Popover, type TabsProps } from 'antd';
 import { useEffect, useState } from "react";
 import { SendActivityDisplay } from "../../components/actions/send-activity/display-component";
-import SendActivityPrevDisplay from "../../components/actions/send-activity/prev";
 
 
 export default function AnalyticsPage() {
@@ -116,22 +115,6 @@ function Tab2() {
             dataIndex: 'actionId',
             render: (_: any, { actionId }: any) => {
                 return (<>
-                    <Popover
-                        style={{
-                            width: 220
-                        }}
-                        placement={"right"}
-                        content={
-                            <>
-                                <SendActivityPrevDisplay />
-                            </>
-                        }
-                        trigger="click"
-                        open={visible.actionId}
-                        onOpenChange={(newOpen) => handleOpenChange(newOpen, actionId)}
-                    >
-                        <a >{actionId}</a>
-                    </Popover >
                 </>)
             }
 
