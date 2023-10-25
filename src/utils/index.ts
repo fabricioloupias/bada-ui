@@ -2,34 +2,54 @@ import { Action } from "@/models/Action"
 
 export const parseToActions = (nodes: Action[], actions: Action[]) => {
     nodes.forEach((n: Action) => {
-        if (n.type !== "Node.Begin" && n.type !== "Node.End") {
-            if (n.data) {
-                if (n.type == "Microsoft.IfCondition") {
-                    const action = n.data
-                    action.actions = []
-                    action.elseActions = []
-                    parseToActions(n.children[0].children, action.actions)
-                    parseToActions(n.children[1].children, action.elseActions)
-                    actions.push(action)
-                    return
-                }
+        if (n.data) {
+            if (n.type == "Microsoft.IfCondition") {
+                const action = n.data
+                action.actions = []
+                action.elseActions = []
+                parseToActions(n.children[0].children, action.actions)
+                parseToActions(n.children[1].children, action.elseActions)
+                actions.push(action)
+            }
 
-                if (n.type == "Microsoft.SwitchCondition") {
-                    const action = n.data
+            if (n.type == "Microsoft.SwitchCondition") {
+                const action = n.data
 
-                    action.cases = []
-                    action.cases = n.children.map((c: any) => {
+                action.cases = []
+                n.children.forEach((c: Action) => {
+                    if (c.children.length > 0) {
                         const switchCase = c.data;
                         switchCase.actions = []
-                        const actions: never[] = [];
+                        const actions: Action[] = [];
                         parseToActions(c.children, actions)
                         switchCase.actions = actions
-                        return switchCase
-                    })
-                    actions.push(action)
-                    return
-                }
+                        action.cases.push(switchCase)
+                    }
+                })
+                actions.push(action)
+            }
 
+            if (n.type == "Microsoft.BeginDialog") {
+                actions.push(n.data)
+            }
+
+            if (n.type == "Microsoft.SendActivity") {
+                actions.push(n.data)
+            }
+
+            if (n.type == "Microsoft.ChoiceInput") {
+                actions.push(n.data)
+            }
+
+            if (n.type == "Microsoft.TextInput") {
+                actions.push(n.data)
+            }
+
+            if (n.type == "Microsoft.HttpRequest") {
+                actions.push(n.data)
+            }
+
+            if (n.type == "Microsoft.CancelAllDialogs") {
                 actions.push(n.data)
             }
         }

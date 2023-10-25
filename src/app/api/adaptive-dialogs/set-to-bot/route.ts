@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
             adaptive.triggers = triggersCopy
             toBot.push(adaptive)
         })
+
         const response = await axios.post('http://192.168.0.243:3978/api/publish', {
             dialogs: toBot
         })
@@ -76,6 +77,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(jsonResponse);
     } catch (error: any) {
+        console.error(error)
         return createErrorResponse(error.message, 500);
     }
 }
