@@ -9,7 +9,8 @@ import AddTopicComponent from "../add-topic";
 import { IAdaptiveDialog } from "../../interfaces/IAdaptiveDialog";
 import { ITrigger } from "@/interfaces/ITrigger";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { Delete16Regular } from "@fluentui/react-icons";
+import { EditableNode, EditableTreeTitle } from "./crud-tree-antd";
+import { deleteTreeNode } from "./utils";
 
 type FlowTreeProps = {
     botVersionId: string
@@ -22,6 +23,7 @@ export type NewTrigger = {
 
 export default function FlowTree({ botVersionId }: FlowTreeProps) {
     const {
+        deleteTrigger,
         updateAdaptiveDialog
     } = useBoundStore((state) => state)
     const getAdaptiveDialogs = useBoundStore((state) => state.getAdaptiveDialogs)
@@ -30,7 +32,8 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
     const statusFetchingAdaptiveDialogs = useBoundStore((state) => state.statusFetchingAdaptiveDialogs)
     const saveTrigger = useBoundStore((state) => state.saveTrigger)
     const saveAdaptiveDialog = useBoundStore((state) => state.saveAdaptiveDialog)
-    const [treeData, setTreeData] = useState<DataNode[]>([]);
+    const [treeData, setTreeData] = useState<EditableNode[]>([]);
+    const [editableTreeData, setEditableTreeData] = useState<DataNode[]>([]);
     const [isModalTriggerOpen, setIsModalTriggerOpen] = useState(false);
     const [isModalTopicOpen, setIsModalTopicOpen] = useState(false);
     const [modalTitle, setModalTitle] = useState<string>("")
@@ -102,7 +105,7 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
     }
 
     const getTreeData = (adaptiveDialogs: IAdaptiveDialog[]) => {
-        const expandedKeys = []
+        const expandedKeys: string[] = []
         let mainIndex = 0
         let countAdaptiveIndex = 0
         if (adaptiveDialogs.length > 0) {
@@ -117,16 +120,15 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                     expandedKeys.push(key)
                     return {
                         key,
-                        title:
-                            <Space align="center">
-                                <Link href={`editor/${t._id}`}>{formatTrigger(t)}</Link>
-                                <Delete16Regular />
-                            </Space>
-                        ,
-                        icon: <Flash16Regular />
-                    }
+                        id: t._id,
+                        title: <Link href={`editor/${t._id}`}>{formatTrigger(t)}</Link>,
+                        type: "trigger"
+                        // icon: <Flash16Regular />
+                    } as EditableNode
                 })
-                countIndex++
+                if (children.length > 0) {
+                    countIndex++
+                }
                 const key = `${mainIndex}-${index}-${countIndex}`
                 expandedKeys.push(key)
                 children.push({
@@ -137,33 +139,33 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                     >
                         Agregar disparador
                     </Button>,
-                    icon: <Flash16Regular />
-                })
+                    type: "addTrigger"
+                } as EditableNode)
                 expandedKeys.push(`${mainIndex}-${index}`)
                 if (adaptiveDialog.id === "Root") {
                     setRootAdaptiveDialog(adaptiveDialog)
                     return {
                         key: `${mainIndex}-${index}`,
-                        title:
-                            <Space>
-                                {adaptiveDialog.id}
-                                <EditOutlined />
-                            </Space>,
-                        icon: <CarryOutOutlined />,
+                        title: adaptiveDialog.id,
+                        // icon: <CarryOutOutlined />,
+                        id: adaptiveDialog._id,
                         children,
+                        type: "adaptiveDialog",
                         selectable: true
-                    } as DataNode
+                    } as EditableNode
                 } else {
                     return {
                         key: `${mainIndex}-${index}`,
                         title: adaptiveDialog.id,
-                        icon: <CarryOutOutlined />,
+                        id: adaptiveDialog._id,
+                        type: "adaptiveDialog",
+                        // icon: <CarryOutOutlined />,
                         children,
                         selectable: false
-                    } as DataNode
+                    } as EditableNode
                 }
 
-            }) as DataNode[]
+            }) as EditableNode[]
             countAdaptiveIndex++
 
             expandedKeys.push(`${mainIndex}-${countAdaptiveIndex}`)
@@ -171,17 +173,21 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                 key: `${mainIndex}-${countAdaptiveIndex}`,
                 title: (<Button
                     size="small"
+
                     onClick={() => showModalToTopic()}
                 >
                     Agregar tema
                 </Button>),
+                type: "addAdaptiveDialog",
                 icon: <CarryOutOutlined />,
                 children: []
-            })
+            } as EditableNode)
             setExpandedKeys(expandedKeys)
-            setTreeData([...data])
+            console.log(data)
+            setTreeData(data)
         }
     }
+
 
     useEffect(() => {
         getAdaptiveDialogs(botVersionId)
@@ -190,6 +196,7 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
 
     useEffect(() => {
         getTreeData(deepAdaptiveDialogs)
+        // getEditableTreeData(deepAdaptiveDialogs)
     }, [deepAdaptiveDialogs])
 
     const addTrigger = async (dialogId: string, triggerValue: NewTrigger) => {
@@ -212,13 +219,17 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
     }
 
     const addTopic = async (botVersionId: string, topicIdValue: string) => {
-        const adaptiveDialog = await saveAdaptiveDialog({
-            botVersionId,
-            id: topicIdValue
-        })
-        deepAdaptiveDialogs.push(adaptiveDialog)
-        setDeepAdaptiveDialogs(deepAdaptiveDialogs)
-        getTreeData(deepAdaptiveDialogs)
+        try {
+            const adaptiveDialog = await saveAdaptiveDialog({
+                botVersionId,
+                id: topicIdValue
+            })
+            deepAdaptiveDialogs.push(adaptiveDialog)
+            setDeepAdaptiveDialogs(deepAdaptiveDialogs)
+            getTreeData(deepAdaptiveDialogs)
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     const afterClose = () => {
@@ -242,6 +253,20 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
         setIsModalEditRootOpen(false);
     };
 
+    const onClickDeleteNode = async (node: EditableNode) => {
+        // solo se recibe nodos eliminables con ids
+        if (node.type === "trigger") {
+            try {
+                await deleteTrigger(node.id!)
+                deleteTreeNode(deepAdaptiveDialogs, node)
+                getTreeData(deepAdaptiveDialogs)
+            } catch (error) {
+                console.error(error)
+            }
+        }
+    }
+
+
     const handleCancelEditRootModal = () => {
         setIsModalEditRootOpen(false);
     };
@@ -256,13 +281,50 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
 
     return (
         <>
+            {treeData.length}
+            {/* {
+                editableTreeData.length > 0
+                    ?
+                    <EditableAntdTree
+                        treeData={editableTreeData}
+                        onTreeChange={(tree) => {
+                            setEditableTreeData((prevData) => tree)
+                        }}
+                        updateTreeData={setEditableTreeData}
+                        updateNode={{
+                            disable(node) {
+                                return node.title !== "Root"
+                            },
+                        }}
+                        createRootParent={{
+                            caption: "Crear tema",
+                            action(node) {
+                                addTopic(botVersionId, node)
+                            },
+                        }}
+                        createParent={{
+                            disable: true
+                        }}
+                        defaultExpandAll
+                    />
+                    :
+                    null
+            } */}
             <Tree
                 showLine
                 defaultExpandAll
                 expandedKeys={expandedKeys}
+                titleRender={(node: any) => (
+                    <EditableTreeTitle
+                        onClickDeleteNode={onClickDeleteNode}
+                        node={node}
+                    />
+                )}
+                // expandedKeys={expandedKeys}
                 treeData={treeData}
                 onSelect={onSelectNode}
             />
+
             <Modal
                 title={modalTitle}
                 onOk={handleOkTrigger}
