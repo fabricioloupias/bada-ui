@@ -1,5 +1,5 @@
-import { Space } from "antd";
-import React, {  } from "react";
+import { Space, Tooltip } from "antd";
+import React, { } from "react";
 import { DataNode } from "antd/es/tree";
 import { Delete12Filled } from "@fluentui/react-icons";
 
@@ -41,10 +41,12 @@ export const EditableTreeTitle = ({
                 }}
                 size={[6, 0]}
                 wrap>
-                <Delete12Filled
-                    onClick={() => {
-                        onClickDeleteNode(node)
-                    }} />
+                <Tooltip title="Eliminar">
+                    <Delete12Filled
+                        onClick={() => {
+                            onClickDeleteNode(node)
+                        }} />
+                </Tooltip>
             </Space>
         </>
     );

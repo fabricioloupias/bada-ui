@@ -24,6 +24,7 @@ export type NewTrigger = {
 export default function FlowTree({ botVersionId }: FlowTreeProps) {
     const {
         deleteTrigger,
+        deleteAdaptiveDialog,
         updateAdaptiveDialog
     } = useBoundStore((state) => state)
     const getAdaptiveDialogs = useBoundStore((state) => state.getAdaptiveDialogs)
@@ -264,6 +265,17 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                 console.error(error)
             }
         }
+
+        if (node.type === "adaptiveDialog") {
+            try {
+                const repsonse = await deleteAdaptiveDialog(node.id!)
+                console.log(repsonse)
+                deleteTreeNode(deepAdaptiveDialogs, node)
+                getTreeData(deepAdaptiveDialogs)
+            } catch (error) {
+                console.error(error)
+            }
+        }
     }
 
 
@@ -281,35 +293,6 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
 
     return (
         <>
-            {treeData.length}
-            {/* {
-                editableTreeData.length > 0
-                    ?
-                    <EditableAntdTree
-                        treeData={editableTreeData}
-                        onTreeChange={(tree) => {
-                            setEditableTreeData((prevData) => tree)
-                        }}
-                        updateTreeData={setEditableTreeData}
-                        updateNode={{
-                            disable(node) {
-                                return node.title !== "Root"
-                            },
-                        }}
-                        createRootParent={{
-                            caption: "Crear tema",
-                            action(node) {
-                                addTopic(botVersionId, node)
-                            },
-                        }}
-                        createParent={{
-                            disable: true
-                        }}
-                        defaultExpandAll
-                    />
-                    :
-                    null
-            } */}
             <Tree
                 showLine
                 defaultExpandAll
@@ -320,7 +303,6 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                         node={node}
                     />
                 )}
-                // expandedKeys={expandedKeys}
                 treeData={treeData}
                 onSelect={onSelectNode}
             />
