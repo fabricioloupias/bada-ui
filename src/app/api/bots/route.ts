@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
             id: "Root",
             recognizer: {
                 $kind: "Bada.MCRecognizer",
-                intents: []
             }
         })
         await adaptiveDialog.save()

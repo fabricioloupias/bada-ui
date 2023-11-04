@@ -12,9 +12,7 @@ export default function BotIdLayout(props: BotIdLayoutProps) {
                 height: '100%',
             }}
         >
-            <Content
-                style={{
-                }}>
+            <Content>
                 {props.children}
             </Content>
         </Layout>

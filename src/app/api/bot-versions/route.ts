@@ -75,8 +75,6 @@ export async function POST(request: NextRequest) {
                 $kind: "Microsoft.AdaptiveDialog",
                 recognizer: {
                     $kind: "Bada.MCRecognizer",
-                    intents: [
-                    ]
                 }
             })
 

@@ -18,7 +18,16 @@ export default function VersionList({ botId }: VersionListProps) {
     const columns: ColumnsType<IBotVersion> = [
         {
             title: 'Version',
-            dataIndex: 'version',
+            key: 'version',
+            render: (_, { _id, version }) => (
+                <Space size="middle">
+                    <Link
+                        href={`/versions/${_id}/topics`}
+                    >
+                        {version}
+                    </Link>
+                </Space>
+            ),
         },
         {
             title: 'Creada por',
@@ -41,15 +50,16 @@ export default function VersionList({ botId }: VersionListProps) {
             dataIndex: 'createdAt',
         },
         {
-            title: 'Acciones',
-            key: 'action',
+            title: 'Publicar',
+            key: 'publish',
             render: (_, { _id }) => (
                 <Space size="middle">
-                    <Link
-                        href={`/versions/${_id}/topics`}
-                    >
-                        Ver versión
-                    </Link>
+                    <Button>
+                        Certificación
+                    </Button>
+                    <Button>
+                        Producción
+                    </Button>
                 </Space>
             ),
         },
@@ -61,14 +71,9 @@ export default function VersionList({ botId }: VersionListProps) {
 
     return (
         <>
-            <Button
-                onClick={() => createVersion(botId)}>
-                Nueva versión
-            </Button>
             <Table
                 columns={columns}
                 dataSource={versions}
-
                 rowKey="_id"
             />
         </>
