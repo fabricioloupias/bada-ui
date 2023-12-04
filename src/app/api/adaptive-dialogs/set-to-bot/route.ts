@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
             toBot.push(adaptive)
         })
 
-        const response = await axios.post('http://192.168.0.243:3978/api/publish', {
+        const response = await axios.post(`${process.env.BADA_HOST}/api/publish`, {
             dialogs: toBot
         })
 
