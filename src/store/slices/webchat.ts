@@ -1,9 +1,12 @@
 import { StateCreator } from "zustand"
 import { BoundStoreType } from ".."
+import { persist } from "zustand/middleware";
 
 export interface WebchatSlice {
     botServiceUrl: string | null;
-    setBotServiceUrl: (botServiceUrl: string) => void
+    setBotServiceUrl: (botServiceUrl: string) => void;
+    store: any;
+    setStore: (store: any) => void
 }
 
 export const createWebchatSlice: StateCreator<
@@ -11,9 +14,16 @@ export const createWebchatSlice: StateCreator<
     [],
     [['zustand/persist', unknown]],
     WebchatSlice
-> = (set, get) => ({
+> = persist((set, get) => ({
     botServiceUrl: null,
     setBotServiceUrl: (botServiceUrl: string) => {
         set({ botServiceUrl })
-    }
+    },
+    setStore: (store) => {
+        console.log(store)
+        set(() => ({ store: JSON.stringify(store) }))
+    },
+    store: null
+}), {
+    name: "store-webchat"
 })

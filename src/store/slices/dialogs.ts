@@ -31,36 +31,33 @@ export const createDialoglice: StateCreator<
         isError: false
     },
     getAdaptiveDialogs: async (botVersionId: string) => {
-        const deepAdaptiveDialogs = get().deepAdaptiveDialogs
-        if (deepAdaptiveDialogs.length === 0) {
+        set({
+            statusFetchingAdaptiveDialogs: {
+                isLoading: true,
+                isError: false
+            }
+        })
+        try {
+            const response = await fetch(`/api/adaptive-dialogs?botVersionId=${botVersionId}`)
+            const json = await response.json()
+
             set({
                 statusFetchingAdaptiveDialogs: {
-                    isLoading: true,
+                    isLoading: false,
                     isError: false
                 }
             })
-            try {
-                const response = await fetch(`/api/adaptive-dialogs?botVersionId=${botVersionId}`)
-                const json = await response.json()
 
-                set({
-                    statusFetchingAdaptiveDialogs: {
-                        isLoading: false,
-                        isError: false
-                    }
-                })
-
-                set({ adaptiveDialogs: json.adaptive_dialogs })
-                set({ deepAdaptiveDialogs: json.adaptive_dialogs })
-            } catch (error) {
-                console.error(error)
-                set({
-                    statusFetchingAdaptiveDialogs: {
-                        isLoading: false,
-                        isError: true
-                    }
-                })
-            }
+            set({ adaptiveDialogs: json.adaptive_dialogs })
+            set({ deepAdaptiveDialogs: json.adaptive_dialogs })
+        } catch (error) {
+            console.error(error)
+            set({
+                statusFetchingAdaptiveDialogs: {
+                    isLoading: false,
+                    isError: true
+                }
+            })
         }
     },
     setDeepAdaptiveDialogs: (adaptiveDialogs: IAdaptiveDialog[]) => {

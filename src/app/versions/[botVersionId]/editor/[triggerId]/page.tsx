@@ -12,15 +12,9 @@ type EditorTriggerIdProps = {
 export default function EditorTriggerIdPage({ params }: EditorTriggerIdProps) {
     return (
         <>
-            <Content
-                style={{
-                    padding: 0,
-                    height: '100%'
-                }}>
-                <Editor
-                    triggerId={params.triggerId}
-                />
-            </Content>
+            <Editor
+                triggerId={params.triggerId}
+            />
         </>
     );
 }

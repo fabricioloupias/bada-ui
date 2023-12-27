@@ -1,4 +1,3 @@
 .flow-builder-wrap {
-    display: block;
-    overflow: auto;
+    height: 92.5% !important;
 }

@@ -15,20 +15,18 @@ export default function VersionLayout(props: VersionLayoutProps) {
                 height: '100%',
             }}
         >
-             <Sider
+            <Sider
                 width={330}
                 style={{
                     background: 'white',
                     padding: 20
                 }}
             >
-                <Title style={{
-                    marginTop: 0
-                }} level={4}>Test chatbot</Title>
                 <WebChat />
             </Sider>
             <Content
                 style={{
+                    height: '100%',
                 }}>
                 {props.children}
             </Content>

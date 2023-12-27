@@ -9,9 +9,10 @@ import { PopoverComponent } from '@/components/popover';
 import { PopconfirmComponent } from '@/components/popconfim';
 import { ObjectId } from '@/utils'
 import { useBoundStore } from '../../store';
-import { Button } from '@/components/antd';
+import { Button, Col, Header, Row, Space, Title } from '@/components/antd';
 import { registerNodes } from '@/lib/register-nodes';
 import { useRouter } from 'next/navigation';
+import { LeftOutlined } from '@ant-design/icons';
 
 type EditorProps = {
     triggerId: string
@@ -63,17 +64,42 @@ export default function Editor(props: EditorProps) {
     if (!isLoadingFlow) {
         return (
             <>
-                <Button
-                    onClick={() => router.back()}
-                >
-                    Volver
-                </Button>
-                <Button
-                    disabled={!changesToSave}
-                    onClick={onSaveActions}
-                >
-                    Guardar
-                </Button>
+                <Header
+                    style={{
+                        padding: "0 10px",
+                        backgroundColor: "white",
+                        borderLeft: "1px solid rgba(5, 5, 5, 0.06)",
+                        borderBottom: "1px solid rgba(5, 5, 5, 0.06)"
+                    }}>
+                    <Row
+                        justify="space-between"
+                        align="middle"
+                    >
+                        <Col span={10}>
+                            <Space >
+                                <Button
+                                    type='text'
+                                    icon={<LeftOutlined />}
+                                    onClick={() => router.back()}
+                                >
+                                </Button>
+                                <Title style={{
+                                    margin: 0
+                                }} level={3}>Editor</Title>
+                            </Space>
+                        </Col>
+                        <Col span={3}>
+                            <Button
+                                block
+                                disabled={!changesToSave}
+                                onClick={onSaveActions}
+                            >
+                                Guardar
+                            </Button>
+                        </Col>
+                    </Row>
+                </Header>
+
                 <FlowBuilder
                     nodes={actions}
                     zoomTool
