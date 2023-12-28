@@ -1,10 +1,8 @@
-import { Button, Divider, Space, Tag, Typography } from 'antd';
 import { useContext } from "react";
 import { NodeContext } from "react-flow-builder";
 import { NodeCard } from "@/components/node-card";
 import { ChoiceInputNode, primaryColor } from '.';
-
-const { Text, Paragraph } = Typography;
+import { Button, Space, Switch, Tag, Text, Paragraph } from "../../../antd";
 
 const ChoiceInputDisplay = () => {
 

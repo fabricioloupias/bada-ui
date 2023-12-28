@@ -1,12 +1,10 @@
 import React, { useContext } from 'react';
 import { BuilderContext, IConfigComponent, useDrawer } from 'react-flow-builder';
-import { Form, Button, Input, InputNumber, Space } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { ChoiceInputNode } from '.';
-
-const { TextArea } = Input;
-
-
+import { Button, Checkbox, Form, InputNumber, Space, TextArea } from '../../../antd';
+import { Input, Switch } from 'antd';
+import { SendActivityNode } from '../../../actions/send-activity';
 
 const ChoiceInputConfig = (props: IConfigComponent) => {
     const { selectedNode: node } = useContext(BuilderContext);
@@ -27,14 +25,17 @@ const ChoiceInputConfig = (props: IConfigComponent) => {
     };
 
     const [form] = Form.useForm();
-
+    
     return <>
         <Form
             name="dynamic_form_item"
             onFinish={onFinish}
             style={{ width: '100%' }}
             layout='vertical'
-            initialValues={node?.data}
+            initialValues={{
+                ...node?.data,
+                isInput: node?.data?.isInput ?? false
+            }}
             form={form}
         >
             <Form.Item
