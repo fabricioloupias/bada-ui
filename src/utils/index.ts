@@ -3,7 +3,7 @@ import { Action } from "@/models/Action"
 export const parseToActions = (nodes: Action[], actions: Action[]) => {
     nodes.forEach((n: Action) => {
         if (n.data) {
-            if (n.type == "Microsoft.IfCondition") {
+            if (n.type === "Microsoft.IfCondition") {
                 const action = n.data
                 action.actions = []
                 action.elseActions = []
@@ -12,7 +12,7 @@ export const parseToActions = (nodes: Action[], actions: Action[]) => {
                 actions.push(action)
             }
 
-            if (n.type == "Microsoft.SwitchCondition") {
+            if (n.type === "Microsoft.SwitchCondition") {
                 const action = n.data
 
                 action.cases = []
@@ -29,35 +29,39 @@ export const parseToActions = (nodes: Action[], actions: Action[]) => {
                 actions.push(action)
             }
 
-            if (n.type == "Microsoft.BeginDialog") {
+            if (n.type === "Microsoft.BeginDialog") {
                 actions.push(n.data)
             }
 
-            if (n.type == "Microsoft.SendActivity") {
+            if (n.type === "Microsoft.SendActivity") {
                 actions.push(n.data)
             }
 
-            if (n.type == "Microsoft.ChoiceInput") {
+            if (n.type === "Microsoft.ChoiceInput") {
                 actions.push(n.data)
             }
 
-            if (n.type == "Microsoft.TextInput") {
+            if (n.type === "Microsoft.TextInput") {
                 actions.push(n.data)
             }
 
-            if (n.type == "Microsoft.HttpRequest") {
+            if (n.type === "Microsoft.HttpRequest") {
                 actions.push(n.data)
             }
 
-            if (n.type == "Microsoft.CancelAllDialogs") {
+            if (n.type === "Microsoft.CancelAllDialogs") {
                 actions.push(n.data)
             }
 
-            if (n.type == "Microsoft.EndTurn") {
+            if (n.type === "Microsoft.SetProperty") {
                 actions.push(n.data)
             }
 
-            if (n.type == "Bada.FunnelTag") {
+            if (n.type === "Microsoft.EndTurn") {
+                actions.push(n.data)
+            }
+
+            if (n.type === "Bada.FunnelTag") {
                 actions.push(n.data)
             }
         }
