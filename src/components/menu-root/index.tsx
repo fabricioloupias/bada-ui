@@ -1,7 +1,6 @@
 "use client"
 import Link from "next/link";
-import { useBoundStore } from "../../store";
-import { Bot20Regular, DataTrending20Regular, DocumentData20Regular, Home20Regular, Menu } from '@/components/antd';
+import { Bot20Regular, DataTrending20Regular, Home20Regular, Menu } from '@/components/antd';
 
 export default function MenuRoot() {
     return (
