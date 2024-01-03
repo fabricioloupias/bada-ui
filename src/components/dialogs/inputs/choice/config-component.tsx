@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { BuilderContext, IConfigComponent, useDrawer } from 'react-flow-builder';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { ChoiceInputNode } from '.';
@@ -9,23 +9,57 @@ import { SendActivityNode } from '../../../actions/send-activity';
 const ChoiceInputConfig = (props: IConfigComponent) => {
     const { selectedNode: node } = useContext(BuilderContext);
     const { saveDrawer: save } = useDrawer();
+    const [form] = Form.useForm();
+
+    const isInput = Form.useWatch('isInput', form);
 
     const onFinish = (values: any) => {
-        values.$kind = ChoiceInputNode.type
-        values.choices = values.choices.map((c: any) => ({
-            ...c,
-            action: {
-                ...c.action,
-                type: "messageBack",
-                text: c.action.title,
-                value: c.value
+        const isInput = values.isInput;
+
+        if (isInput) {
+            values.$kind = ChoiceInputNode.type
+            values.choices = values.choices.map((c: any) => ({
+                ...c,
+                action: {
+                    ...c.action,
+                    type: "messageBack",
+                    text: c.action.title,
+                    value: c.value
+                }
+            }))
+        } else {
+            values.$kind = SendActivityNode.type;
+            values.activity = {
+                attachments: [
+                    {
+                        contentType: "application/vnd.microsoft.card.adaptive",
+                        content: {
+                            $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+                            type: "AdaptiveCard",
+                            version: "1.3",
+                            body: [
+                                {
+                                    type: "TextBlock",
+                                    text: values.prompt
+                                }
+                            ],
+                            actions: values.choices.map((c: any) => ({
+                                type: "Action.Submit",
+                                title: c.action.title,
+                                data: {
+                                    value: c.value
+                                }
+                            }))
+                        }
+                    }
+                ]
             }
-        }))
+        }
         save?.(values, false);
     };
 
-    const [form] = Form.useForm();
-    
+
+
     return <>
         <Form
             name="dynamic_form_item"
@@ -38,6 +72,12 @@ const ChoiceInputConfig = (props: IConfigComponent) => {
             }}
             form={form}
         >
+            <Form.Item
+                name="isInput"
+                label="Esperar respuesta de usuario?"
+            >
+                <Switch defaultChecked={node?.data?.isInput} />
+            </Form.Item>
             <Form.Item
                 name="prompt"
                 label="Mensaje"
@@ -96,15 +136,16 @@ const ChoiceInputConfig = (props: IConfigComponent) => {
             <Form.Item
                 name="invalidPrompt"
                 label="Mensaje para respuesta inválida"
-                rules={[{ required: true }]}>
+                rules={[{ required: isInput }]}>
                 <TextArea
                     placeholder="Cuerpo del mensaje"
                 />
             </Form.Item>
             <Form.Item
+                shouldUpdate
                 name="property"
                 label="Guardar respuesta en..."
-                rules={[{ required: true }]}>
+                rules={[{ required: isInput }]}>
                 <Input
                     placeholder="Nombre variable"
                 />
@@ -151,7 +192,7 @@ const ChoiceInputConfig = (props: IConfigComponent) => {
             <Form.Item
                 name="style"
                 label="Estilo"
-                rules={[{ required: true }]}>
+                rules={[{ required: isInput }]}>
                 <InputNumber
                     min={0}
                     max={5}

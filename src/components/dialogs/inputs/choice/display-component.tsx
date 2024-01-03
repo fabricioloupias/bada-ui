@@ -25,6 +25,8 @@ const ChoiceInputDisplay = () => {
                                 width: '100%'
                             }}
                         >
+                            <Text strong>Esperar respuesta de usuario?</Text>
+                            <Switch checked={node?.data?.isInput} />
                             <Text strong>Mensaje cuerpo</Text>
                             <Paragraph
                             >
@@ -41,19 +43,31 @@ const ChoiceInputDisplay = () => {
                                     {c.action.title}
                                 </Button>
                             )}
-                            <Text strong>Respuesta guardada en...</Text>
-                            <Text code>{node.data.property}</Text>
-                            <Text strong>Mensaje para respuesta inválida</Text>
-                            <Paragraph
-                            >
-                                <pre
-                                    style={{
-                                        margin: 0
-                                    }}
-                                >{node.data?.invalidPrompt}</pre>
-                            </Paragraph>
-                            <Text strong>Estilo</Text>
-                            <Text code>{node.data.style}</Text>
+                            {node?.data?.isInput ??
+                                <>
+                                    <Text strong>Respuesta guardada en...</Text>
+                                    <Text code>{node.data.property}</Text>
+                                </>
+                            }
+                            {node?.data?.isInput ??
+                                <>
+                                    <Text strong>Mensaje para respuesta inválida</Text>
+                                    <Paragraph
+                                    >
+                                        <pre
+                                            style={{
+                                                margin: 0
+                                            }}
+                                        >{node.data?.invalidPrompt}</pre>
+                                    </Paragraph>
+                                </>
+                            }
+                            {node?.data?.isInput ??
+                                <>
+                                    <Text strong>Estilo</Text>
+                                    <Text code>{node.data.style}</Text>
+                                </>
+                            }
                         </Space>
                     </>
                     :
@@ -66,7 +80,7 @@ const ChoiceInputDisplay = () => {
                         Agregar opciones
                     </Tag>
             }
-        </NodeCard>
+        </NodeCard >
     );
 };
 
