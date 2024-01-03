@@ -14,6 +14,7 @@ import { EndNode } from "@/components/nodes/end";
 import { OnBeginDialogNode } from "@/components/triggers/on-begin-dialog";
 import { OnIntentNode } from "@/components/triggers/on-intent";
 import { IRegisterNode } from "react-flow-builder";
+import { EndTurnNode } from "../components/actions/end-turn";
 
 // registro de tipos de nodos, agregar a la lista para el renderizado en el componente Editor
 // el orden es el que aparecerá en el popup del editor
@@ -32,5 +33,6 @@ export const registerNodes: IRegisterNode[] = [
     EndNode,
     TextInputNode,
     FunnelTagNode,
+    EndTurnNode,
     CancelAllDialogsNode,
 ];
