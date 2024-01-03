@@ -52,6 +52,11 @@ export const parseToActions = (nodes: Action[], actions: Action[]) => {
             if (n.type == "Microsoft.CancelAllDialogs") {
                 actions.push(n.data)
             }
+
+            if (n.type == "Microsoft.EndTurn") {
+                actions.push(n.data)
+            }
+
             if (n.type == "Bada.FunnelTag") {
                 actions.push(n.data)
             }
