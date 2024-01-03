@@ -7,6 +7,8 @@ export interface WebchatSlice {
     setBotServiceUrl: (botServiceUrl: string) => void;
     store: any;
     setStore: (store: any) => void
+    isWebchatOpen: boolean;
+    setIsWebchatOpen: (isWebchatOpen: boolean) => void
 }
 
 export const createWebchatSlice: StateCreator<
@@ -23,7 +25,12 @@ export const createWebchatSlice: StateCreator<
         console.log(store)
         set(() => ({ store: JSON.stringify(store) }))
     },
-    store: null
+    store: null,
+    isWebchatOpen: false,
+    setIsWebchatOpen: (isWebchatOpen: boolean) => {
+        console.log(isWebchatOpen)
+        set({ isWebchatOpen: isWebchatOpen })
+    }
 }), {
     name: "store-webchat"
 })

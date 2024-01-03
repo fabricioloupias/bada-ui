@@ -1,7 +1,7 @@
 "use client"
 
 import Script from "next/script"
-import { Button, Card, Col, Input, Modal, Row, Title } from "@/components/antd"
+import { Button, Card, Col, Input, Modal, Row, Sider, Title } from "@/components/antd"
 import { useBoundStore } from "../../store"
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
@@ -18,6 +18,7 @@ export default function WebChat() {
     const {
         botServiceUrl,
         setBotServiceUrl,
+        isWebchatOpen
     } = useBoundStore(state => state);
 
     const [botServiceUrlInput, setBotServiceUrlInput] = useState<string>("");
@@ -58,7 +59,7 @@ export default function WebChat() {
     };
 
     const loadChatbot = () => {
-        
+
         setStore(st)
 
         setDirectLine(createDirectLine({
@@ -73,47 +74,55 @@ export default function WebChat() {
         loadChatbot()
     }, [botServiceUrl]);
 
-    return (
-        <>
-            <Row>
-                <Col span={14}>
-                    <Title style={{
-                        marginTop: 0
-                    }} level={4}>Test chatbot</Title>
-                </Col>
-                <Col span={10}>
-                    <Button block onClick={showModal}>
-                        Conectar a bot
-                    </Button>
-                    <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                        <Input
-                            onChange={handleInputChange}
-                            placeholder="Setear url de servicio"
-                        />
-                    </Modal>
-                </Col>
-            </Row>
-            {botServiceUrl && directLine && store
-                ?
-                <>
-                    <Card
-                        bodyStyle={{
-                            height: '100%',
-                            padding: 0
-                        }}
-                        style={{
-                            height: '95%'
-                        }}>
-                        <ReactWebChat
-                            store={store}
-                            directLine={directLine}
-                        />
-                    </Card></>
-                :
-                null
-            }
+    if (isWebchatOpen) {
+        return (
+            <Sider
+                width={330}
+                style={{
+                    background: 'white',
+                    padding: 20
+                }}
+            >
+                <Row>
+                    <Col span={14}>
+                        <Title style={{
+                            marginTop: 0
+                        }} level={4}>Test chatbot</Title>
+                    </Col>
+                    <Col span={10}>
+                        <Button block onClick={showModal}>
+                            Conectar a bot
+                        </Button>
+                        <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                            <Input
+                                onChange={handleInputChange}
+                                placeholder="Setear url de servicio"
+                            />
+                        </Modal>
+                    </Col>
+                </Row>
+                {botServiceUrl && directLine && store
+                    ?
+                    <>
+                        <Card
+                            bodyStyle={{
+                                height: '100%',
+                                padding: 0
+                            }}
+                            style={{
+                                height: '95%'
+                            }}>
+                            <ReactWebChat
+                                store={store}
+                                directLine={directLine}
+                            />
+                        </Card></>
+                    :
+                    null
+                }
+            </Sider>
+        )
+    }
 
-        </>
-    )
-
+    return null
 }

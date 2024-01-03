@@ -15,15 +15,7 @@ export default function VersionLayout(props: VersionLayoutProps) {
                 height: '100%',
             }}
         >
-            <Sider
-                width={330}
-                style={{
-                    background: 'white',
-                    padding: 20
-                }}
-            >
-                <WebChat />
-            </Sider>
+            <WebChat />
             <Content
                 style={{
                     height: '100%',

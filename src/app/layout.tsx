@@ -1,8 +1,9 @@
-import { Content, Header, Layout, Sider, Title } from '@/components/antd';
+import { Col, Content, Header, Layout, Row, Sider, Title } from '@/components/antd';
 import './globals.css'
 import type { Metadata } from 'next'
 import { ReactNode } from 'react';
 import dynamic from 'next/dynamic'
+import MenuHeader from '../components/menu-header';
 
 const MenuRoot = dynamic(() => import("@/components/menu-root"), { ssr: false })
 
@@ -27,7 +28,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 borderBottom: '1px solid rgba(5, 5, 5, 0.06)'
               }}
             >
-              <Title level={3}>Bada UI</Title>
+              <Row justify="space-between" align="middle">
+                <Col span={4}>
+                  <Title level={3} style={{
+                    margin: 0
+                  }}>Bada Studio</Title>
+                </Col>
+                <Col span={1}>
+                  <MenuHeader />
+                </Col>
+              </Row>
             </Header>
             <Layout>
               <Sider
@@ -45,9 +55,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </Layout>
             </Layout>
           </Layout>
-          {/* <Script
-            crossOrigin='anonymous'
-            src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js" /> */}
         </>
       </body>
     </html>
