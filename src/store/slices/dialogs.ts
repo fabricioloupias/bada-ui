@@ -21,7 +21,7 @@ export interface DialogSlice {
 export const createDialoglice: StateCreator<
     BoundStoreType,
     [],
-    [['zustand/persist', unknown]],
+    [],
     DialogSlice
 > = (set, get) => ({
     adaptiveDialogs: [],
@@ -100,7 +100,6 @@ export const createDialoglice: StateCreator<
         return data.adaptive_dialog
     },
     deleteAdaptiveDialog: async (adaptiveDialogId: string) => {
-        console.log(adaptiveDialogId)
         const response = await fetch(`/api/adaptive-dialogs/${adaptiveDialogId}`, {
             method: 'DELETE'
         })

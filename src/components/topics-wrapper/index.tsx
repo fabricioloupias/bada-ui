@@ -1,25 +1,31 @@
 "use client"
 import TopicsHeader from "@/components/topics-header";
-import { Card } from "@/components/antd";
 
 import dynamic from 'next/dynamic'
-const FlowTree = dynamic(() => import("@/components/flow-tree"), { ssr: false })
+import { useState, useRef, useEffect } from "react";
+const FlowTree = dynamic(() => import("@/components/flow-tree/index"), { ssr: false })
 
 type TopicsVersionWrapperProps = {
     botVersionId: string
 };
 
 export default function TopicsWrapper({ botVersionId }: TopicsVersionWrapperProps) {
+    const [parentHeight, setParentHeight] = useState<number>(0);
+    const elementRef = useRef(null);
+
+    useEffect(() => {
+    }, []);
+
     return (
         <>
             <TopicsHeader
                 botVersionId={botVersionId}
             />
-            <Card>
-                <FlowTree
-                    botVersionId={botVersionId}
-                />
-            </Card>
+
+            <FlowTree
+                parentElementHeight={parentHeight}
+                botVersionId={botVersionId}
+            />
         </>
     );
 }

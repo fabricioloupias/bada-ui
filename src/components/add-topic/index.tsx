@@ -1,15 +1,17 @@
 "use client"
-import { Form, Input } from "@/components/antd"
+import { Button, Form, Input } from "@/components/antd"
 import { Dispatch, SetStateAction, useState } from "react";
 
 type AddTopicComponentProps = {
-    setTopicIdValue: Dispatch<SetStateAction<string>>
+    topicCb: (topicId: string) => void
 }
-export default function AddTopicComponent({ setTopicIdValue }: AddTopicComponentProps) {
+export default function AddTopicComponent({ topicCb }: AddTopicComponentProps) {
     const [form] = Form.useForm();
+    form.resetFields()
 
-    const onTopicIdChange = ({ id }: { id: string }) => {
-        setTopicIdValue(id)
+    const onFinish = ({ id }: { id: string }) => {
+        topicCb(id)
+        form.resetFields()
     };
 
     return (
@@ -17,14 +19,22 @@ export default function AddTopicComponent({ setTopicIdValue }: AddTopicComponent
             <Form
                 layout="vertical"
                 form={form}
-                onValuesChange={onTopicIdChange}
+                onFinish={onFinish}
             >
                 <Form.Item
                     name="id"
-                    label="Tema"
+                    label="Nombre tema"
                 >
-                    <Input placeholder="Título del tema" />
+                    <Input placeholder="Caso de uso" />
                 </Form.Item>
+                <Form.Item>
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                >
+                    Guardar
+                </Button>
+            </Form.Item>
             </Form>
         </>
     )

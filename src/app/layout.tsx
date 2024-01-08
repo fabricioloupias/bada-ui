@@ -25,7 +25,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Header
               style={{
                 background: 'rgb(255, 255, 255)',
-                borderBottom: '1px solid rgba(5, 5, 5, 0.06)'
+                borderBottom: '1px solid rgba(5, 5, 5, 0.06)',
+                position: 'fixed',
+                top: 0,
+                zIndex: 1000,
+                width: '100%',
               }}
             >
               <Row justify="space-between" align="middle">
@@ -43,12 +47,27 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <Sider
                 style={{
                   background: 'rgb(255, 255, 255)',
+                  overflow: 'auto',
+                  paddingTop: 64,
+                  height: '100vh',
+                  position: 'fixed',
+                  left: 0,
+                  top: 0,
+                  bottom: 0
                 }}
               >
                 <MenuRoot />
               </Sider>
-              <Layout>
+              <Layout
+                style={{ 
+                  marginLeft: 199, 
+                  marginTop: 64 
+                }}
+              >
                 <Content
+                  style={{
+                    backgroundColor: '#f5f5f5'
+                  }}
                 >
                   {children}
                 </Content>

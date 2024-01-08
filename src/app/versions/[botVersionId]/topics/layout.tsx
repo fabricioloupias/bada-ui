@@ -1,8 +1,6 @@
 import { ReactNode } from "react";
-import { Content, Layout, Sider, Title } from "@/components/antd";
+import { Content, Layout } from "@/components/antd";
 import dynamic from "next/dynamic";
-
-const WebChat = dynamic(() => import("@/components/webchat"), { ssr: false })
 
 type VersionLayoutProps = {
     children: ReactNode;
@@ -17,6 +15,7 @@ export default function VersionLayout(props: VersionLayoutProps) {
         >
             <Content
                 style={{
+                    padding: 20
                 }}>
                 {props.children}
             </Content>

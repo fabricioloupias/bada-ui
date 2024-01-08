@@ -1,19 +1,31 @@
 "use client"
-import { Key, useEffect, useState } from "react";
-import type { DataNode, EventDataNode } from 'antd/es/tree';
-import Link from "next/link";
-import AddTriggerComponent from "@/components/add-trigger";
-import { Button, CarryOutOutlined, EditOutlined, Flash16Regular, Form, Input, Modal, Space, Title, Tree } from "@/components/antd";
+import './style.css'
+import { useEffect, useMemo, useState } from "react";
+import type { DataNode } from 'antd/es/tree';
+import { Tree, Search, Button, CarryOutOutlined, Modal, Flash16Regular, Text } from "@/components/antd";
 import { useBoundStore } from "@/store";
-import AddTopicComponent from "../add-topic";
 import { IAdaptiveDialog } from "../../interfaces/IAdaptiveDialog";
-import { ITrigger } from "@/interfaces/ITrigger";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { EditableNode, EditableTreeTitle } from "./crud-tree-antd";
+import Link from "next/link";
+import { ITrigger } from "../../interfaces/ITrigger";
 import { deleteTreeNode } from "./utils";
+import AddTriggerComponent from "../add-trigger";
+import AddTopicComponent from "../add-topic";
+
+const formatTrigger = (trigger: ITrigger) => {
+    switch (trigger.$kind) {
+        case "Microsoft.OnIntent":
+            return `Al reconocer intent - ${trigger.intent}`
+        case "Microsoft.OnBeginDialog":
+            return "Al iniciar diálogo"
+        default:
+            return ""
+    }
+}
 
 type FlowTreeProps = {
-    botVersionId: string
+    botVersionId: string,
+    parentElementHeight: number
 };
 
 export type NewTrigger = {
@@ -21,91 +33,62 @@ export type NewTrigger = {
     intent: string
 }
 
-export default function FlowTree({ botVersionId }: FlowTreeProps) {
+export default function FlowTree({ botVersionId, parentElementHeight }: FlowTreeProps) {
     const {
+        deepAdaptiveDialogs,
+        getAdaptiveDialogs,
         deleteTrigger,
         deleteAdaptiveDialog,
-        updateAdaptiveDialog
+        saveTrigger,
+        setDeepAdaptiveDialogs,
+        saveAdaptiveDialog
     } = useBoundStore((state) => state)
-    const getAdaptiveDialogs = useBoundStore((state) => state.getAdaptiveDialogs)
-    const deepAdaptiveDialogs = useBoundStore((state) => state.deepAdaptiveDialogs)
-    const setDeepAdaptiveDialogs = useBoundStore((state) => state.setDeepAdaptiveDialogs)
-    const statusFetchingAdaptiveDialogs = useBoundStore((state) => state.statusFetchingAdaptiveDialogs)
-    const saveTrigger = useBoundStore((state) => state.saveTrigger)
-    const saveAdaptiveDialog = useBoundStore((state) => state.saveAdaptiveDialog)
-    const [treeData, setTreeData] = useState<EditableNode[]>([]);
-    const [editableTreeData, setEditableTreeData] = useState<DataNode[]>([]);
-    const [isModalTriggerOpen, setIsModalTriggerOpen] = useState(false);
-    const [isModalTopicOpen, setIsModalTopicOpen] = useState(false);
-    const [modalTitle, setModalTitle] = useState<string>("")
-    const [triggerValue, setTriggerValue] = useState<NewTrigger>({
-        trigger: "",
-        intent: ""
-    })
-    const [topicIdValue, setTopicIdValue] = useState<string>("")
-    const [isModalTopic, setIsModalTopic] = useState<boolean>(false)
-    const [isModalTrigger, setIsModalTrigger] = useState<boolean>(false)
-    const [adaptiveDialogIdToModal, setAdaptiveDialogIdToModal] = useState<string>("")
-    const [expandedKeys, setExpandedKeys] = useState<string[]>([])
-    const [isModalEditRootOpen, setIsModalEditRootOpen] = useState(false);
-    const [rootAdaptiveDialog, setRootAdaptiveDialog] = useState<IAdaptiveDialog>()
 
-    const formatTrigger = (trigger: ITrigger) => {
-        switch (trigger.$kind) {
-            case "Microsoft.OnIntent":
-                return `Al reconocer intent - ${trigger.intent}`
-            case "Microsoft.OnBeginDialog":
-                return "Al iniciar diálogo"
-            default:
-                return ""
-        }
-    }
+    const [defaultData, setDefaultData] = useState<EditableNode[]>([]);
+    const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+    const [searchValue, setSearchValue] = useState('');
+    const [autoExpandParent, setAutoExpandParent] = useState(true);
+    const [triggerModalOptions, setTriggerModalOptions] = useState<{
+        openModalTrigger: boolean,
+        adaptiveDialogSelected: IAdaptiveDialog | null,
+        triggerValue: string
+    }>({
+        adaptiveDialogSelected: null,
+        openModalTrigger: false,
+        triggerValue: ""
+    });
 
-    const showModalToTrigger = (adaptiveDialogId: string) => {
-        if (adaptiveDialogId) {
-            setAdaptiveDialogIdToModal(adaptiveDialogId)
-            setIsModalTrigger(true)
-            setModalTitle("Agregar disparador")
-            setIsModalTriggerOpen(true);
+    const [topicModalOptions, setTopicModalOptions] = useState<{
+        openModalTopic: boolean,
+    }>({
+        openModalTopic: false,
+    });
+
+    const showModalToTrigger = (adaptiveDialog: IAdaptiveDialog) => {
+        if (adaptiveDialog) {
+            setTriggerModalOptions(prev => (
+                {
+                    ...prev,
+                    adaptiveDialogSelected: adaptiveDialog,
+                    openModalTrigger: true
+                }
+            ))
         }
     };
 
     const showModalToTopic = () => {
-        setIsModalTopic(true)
-        setModalTitle("Agregar tema")
-        setIsModalTopicOpen(true);
+        setTopicModalOptions(prev => ({
+            ...prev,
+            openModalTopic: true
+        }))
     };
 
-    const handleOkTrigger = () => {
-        addTrigger(adaptiveDialogIdToModal, triggerValue)
+    const generateData = (adaptiveDialogs: IAdaptiveDialog[]) => {
+        const rootAdaptiveDialog = adaptiveDialogs.splice(0, 1)[0];
+        
+        adaptiveDialogs = adaptiveDialogs.sort((a, b) => a.id.localeCompare(b.id))
+        adaptiveDialogs.unshift(rootAdaptiveDialog);
 
-        closeModal()
-    };
-
-    const handleOkTopic = () => {
-        addTopic(botVersionId, topicIdValue)
-
-        closeModal()
-    };
-
-    const handleCancel = () => {
-        closeModal();
-    };
-
-    const closeModal = () => {
-        setIsModalTrigger(false)
-        setIsModalTopic(false)
-        setIsModalTriggerOpen(false);
-        setIsModalTopicOpen(false);
-    }
-
-    const onSelectNode = (selectedKeys: Key[], info: { node: EventDataNode<DataNode> }) => {
-        if (info.node.key == "0-0") {
-            showEditRootModal()
-        }
-    }
-
-    const getTreeData = (adaptiveDialogs: IAdaptiveDialog[]) => {
         const expandedKeys: string[] = []
         let mainIndex = 0
         let countAdaptiveIndex = 0
@@ -123,8 +106,8 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                         key,
                         id: t._id,
                         title: <Link href={`editor/${t._id}`}>{formatTrigger(t)}</Link>,
-                        type: "trigger"
-                        // icon: <Flash16Regular />
+                        type: "trigger",
+                        icon: <Flash16Regular />
                     } as EditableNode
                 })
                 if (children.length > 0) {
@@ -136,7 +119,7 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                     key,
                     title: <Button
                         size="small"
-                        onClick={() => showModalToTrigger(adaptiveDialog._id!)}
+                        onClick={() => showModalToTrigger(adaptiveDialog)}
                     >
                         Agregar disparador
                     </Button>,
@@ -144,7 +127,6 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                 } as EditableNode)
                 expandedKeys.push(`${mainIndex}-${index}`)
                 if (adaptiveDialog.id === "Root") {
-                    setRootAdaptiveDialog(adaptiveDialog)
                     return {
                         key: `${mainIndex}-${index}`,
                         title: adaptiveDialog.id,
@@ -160,7 +142,7 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                         title: adaptiveDialog.id,
                         id: adaptiveDialog._id,
                         type: "adaptiveDialog",
-                        // icon: <CarryOutOutlined />,
+                        icon: <CarryOutOutlined />,
                         children,
                         selectable: false
                     } as EditableNode
@@ -184,75 +166,68 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                 children: []
             } as EditableNode)
             setExpandedKeys(expandedKeys)
-            console.log(data)
-            setTreeData(data)
+            // setTreeData(data)
+
+            setDefaultData(data)
         }
-    }
+    };
 
+    const onExpand = (newExpandedKeys: React.Key[]) => {
+        setExpandedKeys(newExpandedKeys);
+        setAutoExpandParent(false);
+    };
 
-    useEffect(() => {
-        getAdaptiveDialogs(botVersionId)
-    }, [botVersionId, getAdaptiveDialogs,])
-
-
-    useEffect(() => {
-        getTreeData(deepAdaptiveDialogs)
-        // getEditableTreeData(deepAdaptiveDialogs)
-    }, [deepAdaptiveDialogs])
-
-    const addTrigger = async (dialogId: string, triggerValue: NewTrigger) => {
-        const newTrigger = {
-            $kind: triggerValue.trigger,
-            adaptiveDialogId: dialogId,
-            intent: triggerValue.intent
-        }
-        const trigger = await saveTrigger(newTrigger)
-
-        const index = deepAdaptiveDialogs.findIndex(d => d._id === dialogId)
-        const dialogSelected = deepAdaptiveDialogs[index]
-        if (dialogSelected) {
-
-            deepAdaptiveDialogs[index].triggers = deepAdaptiveDialogs[index].triggers ?? []
-            deepAdaptiveDialogs[index].triggers!.push(trigger)
-            setDeepAdaptiveDialogs(deepAdaptiveDialogs)
-            getTreeData(deepAdaptiveDialogs)
-        }
-    }
-
-    const addTopic = async (botVersionId: string, topicIdValue: string) => {
-        try {
-            const adaptiveDialog = await saveAdaptiveDialog({
-                botVersionId,
-                id: topicIdValue
+    const onChangeTemaValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        const newExpandedKeys = defaultData
+            .map((item) => {
+                if (typeof item.title === 'string' && item.title.indexOf(value) > -1) {
+                    return item.key
+                }
+                return null;
             })
-            deepAdaptiveDialogs.push(adaptiveDialog)
-            setDeepAdaptiveDialogs(deepAdaptiveDialogs)
-            getTreeData(deepAdaptiveDialogs)
-        } catch (error) {
-            console.error(error)
-        }
-    }
-
-    const afterClose = () => {
-        setIsModalTrigger(false)
-        setIsModalTopic(false)
-    }
-
-    const showEditRootModal = () => {
-        setIsModalEditRootOpen(true);
+            .filter((item, i, self): item is React.Key => !!(item && self.indexOf(item) === i));
+        setExpandedKeys(newExpandedKeys);
+        setSearchValue(value);
+        setAutoExpandParent(true);
     };
 
-    const handleOkEditRootModal = async (values: any) => {
-        if (rootAdaptiveDialog && values) {
-            rootAdaptiveDialog.recognizer!.intents = values.intents
-            try {
-                await updateAdaptiveDialog(rootAdaptiveDialog)
-            } catch (error) {
-                console.error(error)
-            }
-        }
-        setIsModalEditRootOpen(false);
-    };
+    const treeData = useMemo(() => {
+        const loop = (data: DataNode[]): DataNode[] =>
+            data.map((item) => {
+                if (typeof item.title === 'string') {
+                    const strTitle = String(item.title);
+                    const index = strTitle.indexOf(searchValue);
+                    const beforeStr = strTitle.substring(0, index);
+                    const afterStr = strTitle.slice(index + searchValue.length);
+                    const title =
+                        index > -1 ? (
+                            <>
+                                {beforeStr}
+                                <Text mark>{searchValue}</Text>
+                                {afterStr}
+                            </>
+                        ) : (
+                            <span>{strTitle}</span>
+                        );
+
+                    if (item.children) {
+                        return {
+                            ...item,
+                            title,
+                            children: loop(item.children)
+                        };
+                    }
+                }
+
+                return {
+                    ...item,
+                }
+            });
+
+        return loop(defaultData);
+    }, [defaultData, searchValue]);
+
 
     const onClickDeleteNode = async (node: EditableNode) => {
         // solo se recibe nodos eliminables con ids
@@ -260,7 +235,7 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
             try {
                 await deleteTrigger(node.id!)
                 deleteTreeNode(deepAdaptiveDialogs, node)
-                getTreeData(deepAdaptiveDialogs)
+                generateData(deepAdaptiveDialogs)
             } catch (error) {
                 console.error(error)
             }
@@ -271,137 +246,134 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                 const repsonse = await deleteAdaptiveDialog(node.id!)
                 console.log(repsonse)
                 deleteTreeNode(deepAdaptiveDialogs, node)
-                getTreeData(deepAdaptiveDialogs)
+                generateData(deepAdaptiveDialogs)
             } catch (error) {
                 console.error(error)
             }
         }
     }
 
+    const addTrigger = async (dialogId: string, triggerValue: NewTrigger) => {
+        const newTrigger = {
+            $kind: triggerValue.trigger,
+            adaptiveDialogId: dialogId,
+            intent: triggerValue.intent
+        }
+        try {
+            const trigger = await saveTrigger(newTrigger)
+            const adaptiveDialogs = [...deepAdaptiveDialogs]
+            const index = adaptiveDialogs.findIndex(d => d._id === dialogId)
+            const dialogSelected = adaptiveDialogs[index]
+            if (dialogSelected) {
 
-    const handleCancelEditRootModal = () => {
-        setIsModalEditRootOpen(false);
-    };
+                adaptiveDialogs[index].triggers = adaptiveDialogs[index].triggers ?? []
+                adaptiveDialogs[index].triggers!.push(trigger)
+                generateData(adaptiveDialogs)
+                setDeepAdaptiveDialogs(adaptiveDialogs)
+            }
+        } catch (error) {
+            console.error(error)
+        }
 
-    if (statusFetchingAdaptiveDialogs.isError && deepAdaptiveDialogs.length === 0) {
-        return (
-            <>
-                error
-            </>
-        )
     }
 
-    return (
-        <>
-            <Tree
-                showLine
-                defaultExpandAll
-                expandedKeys={expandedKeys}
-                titleRender={(node: any) => (
-                    <EditableTreeTitle
-                        onClickDeleteNode={onClickDeleteNode}
-                        node={node}
-                    />
-                )}
-                treeData={treeData}
-                onSelect={onSelectNode}
-            />
 
-            <Modal
-                title={modalTitle}
-                onOk={handleOkTrigger}
-                afterClose={afterClose}
-                onCancel={handleCancel}
-                open={isModalTriggerOpen}
-            >
-                <AddTriggerComponent
-                    setTriggerValue={setTriggerValue}
+    const addTopic = async (botVersionId: string, topicIdValue: string) => {
+        try {
+            const adaptiveDialog = await saveAdaptiveDialog({
+                botVersionId,
+                id: topicIdValue
+            })
+            deepAdaptiveDialogs.push(adaptiveDialog)
+            generateData(deepAdaptiveDialogs)
+            setDeepAdaptiveDialogs(deepAdaptiveDialogs)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const closeModalTrigger = () => {
+        setTriggerModalOptions(prev => ({
+            ...prev,
+            openModalTrigger: false,
+            adaptiveDialogSelected: null,
+        }))
+    }
+
+    const closeModalTopic = () => {
+        setTopicModalOptions(prev => ({
+            ...prev,
+            openModalTopic: false,
+        }))
+    }
+
+    const triggerCb = (trigger: NewTrigger) => {
+        addTrigger(triggerModalOptions.adaptiveDialogSelected!._id, trigger)
+
+        closeModalTrigger()
+    }
+
+    const topicCb = (topicId: string) => {
+        addTopic(botVersionId, topicId)
+
+        closeModalTopic()
+    }
+
+    useEffect(() => {
+        getAdaptiveDialogs(botVersionId)
+    }, [])
+
+    useEffect(() => {
+        generateData(deepAdaptiveDialogs)
+    }, [deepAdaptiveDialogs])
+
+    return (
+        defaultData.length > 0
+            ?
+            <>
+                <Search style={{ marginBottom: 8 }} placeholder="Buscar tema" onChange={onChangeTemaValue} />
+                <Tree
+                    showLine
+                    onExpand={onExpand}
+                    expandedKeys={expandedKeys}
+                    defaultExpandAll
+                    rootStyle={{
+                        background: 'transparent'
+                    }}
+                    titleRender={(node: any) => (
+                        <EditableTreeTitle
+                            onClickDeleteNode={onClickDeleteNode}
+                            node={node}
+                        />
+                    )}
+                    autoExpandParent={autoExpandParent}
+                    treeData={treeData}
                 />
-            </Modal>
-            <Modal
-                title={modalTitle}
-                onOk={handleOkTopic}
-                afterClose={afterClose}
-                onCancel={handleCancel}
-                open={isModalTopicOpen}
-            >
-                <AddTopicComponent
-                    setTopicIdValue={setTopicIdValue}
-                />
-            </Modal>
-            <Modal title="Editar Root"
-                open={isModalEditRootOpen}
-                onCancel={handleCancelEditRootModal}
-                footer={null}
-            >
-                <Form
-                    name="basic"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    style={{ maxWidth: 600 }}
-                    initialValues={rootAdaptiveDialog?.recognizer}
-                    onFinish={handleOkEditRootModal}
-                    autoComplete="off"
+
+                <Modal
+                    title={`Agregar trigger`}
+                    footer={null}
+                    afterClose={closeModalTrigger}
+                    onCancel={closeModalTrigger}
+                    open={triggerModalOptions.openModalTrigger}
                 >
-                    <Form.List
-                        name="intents"
-                    >
-                        {(fields, { add, remove }, { errors }) => (
-                            <>
-                                {fields.map((field, index) => (
-                                    <Form.Item
-                                        required={false}
-                                        key={field.key}
-                                    >
-                                        <Form.Item
-                                            {...field}
-                                            key={field.key}
-                                            validateTrigger={['onChange', 'onBlur']}
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    whitespace: true,
-                                                    message: "Ingresa el nombre del intent o eliminalo",
-                                                },
-                                            ]}
-                                            noStyle
-                                        >
-                                            <Input placeholder="intent id" style={
-                                                { width: '93%' }
-                                            } />
-                                        </Form.Item>
-                                        {fields.length > 0 ? (
-                                            <MinusCircleOutlined
-                                                className="dynamic-delete-button"
-                                                style={{
-                                                    marginLeft: "5px"
-                                                }}
-                                                onClick={() => remove(field.name)}
-                                            />
-                                        ) : null}
-                                    </Form.Item>
-                                ))}
-                                <Form.Item>
-                                    <Button
-                                        type="dashed"
-                                        onClick={() => add()}
-                                        style={{ width: '100%' }}
-                                        icon={<PlusOutlined />}
-                                    >
-                                        Agregar intent
-                                    </Button>
-                                    <Form.ErrorList errors={errors} />
-                                </Form.Item>
-                            </>
-                        )}
-                    </Form.List>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            Actualizar
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </Modal>
-        </>
+                    <AddTriggerComponent
+                        adaptiveDialog={triggerModalOptions.adaptiveDialogSelected!}
+                        triggerCb={triggerCb}
+                    />
+                </Modal>
+                <Modal
+                    title={`Agregar tema`}
+                    afterClose={closeModalTopic}
+                    footer={null}
+                    onCancel={closeModalTopic}
+                    open={topicModalOptions.openModalTopic}
+                >
+                    <AddTopicComponent
+                        topicCb={topicCb}
+                    />
+                </Modal>
+            </>
+            : null
     )
 }

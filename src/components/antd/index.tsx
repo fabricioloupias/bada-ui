@@ -6,7 +6,7 @@ export { CarryOutOutlined, EditOutlined } from "@ant-design/icons";
 
 const { Content, Header, Sider } = Layout;
 const { Title, Paragraph, Text } = Typography;
-const { TextArea } = Input;
+const { TextArea, Search } = Input;
 const { RangePicker } = DatePicker;
 
 export {
@@ -18,5 +18,6 @@ export {
     Sider,
     Title,
     RangePicker,
-    TextArea
+    TextArea,
+    Search
 }

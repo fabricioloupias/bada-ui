@@ -80,7 +80,14 @@ export default function WebChat() {
                 width={330}
                 style={{
                     background: 'white',
-                    padding: 20
+                    padding: 20,
+                    overflow: 'auto',
+                    paddingTop: 64,
+                    height: '100vh',
+                    position: 'fixed',
+                    left: 200,
+                    top: 0,
+                    bottom: 0
                 }}
             >
                 <Row>

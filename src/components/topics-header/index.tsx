@@ -1,5 +1,5 @@
 "use client"
-import { Button, Title } from "@/components/antd";
+import { Button, Col, Row, Title } from "@/components/antd";
 import { useBoundStore } from "../../store";
 import { useEffect } from "react";
 
@@ -8,9 +8,9 @@ type TopicsHeaderProps = {
 };
 
 export default function TopicsHeader({ botVersionId }: TopicsHeaderProps) {
-    const { 
+    const {
         setVersionSelected,
-        setAdaptiveDialogsOnBot 
+        setAdaptiveDialogsOnBot
     } = useBoundStore((state) => state)
     const botVersionSelected = useBoundStore((state) => state.botVersionSelected)
 
@@ -31,15 +31,20 @@ export default function TopicsHeader({ botVersionId }: TopicsHeaderProps) {
     }
 
     return (
-        <>
-            <Title style={{
-                marginTop: 0
-            }} level={3}>Temas de la versión: {botVersionSelected.version}
-            </Title>
-            <Button
-                onClick={onSetAdaptiveDialogsOnBot}>
-                Previsualización
-            </Button>
-        </>
+        <Row justify="space-between">
+            <Col span={8}>
+                <Title style={{
+                    marginTop: 0
+                }} level={3}>Temas de la versión: {botVersionSelected.version}
+                </Title>
+            </Col>
+            <Col span={4}>
+                <Button
+                    block
+                    onClick={onSetAdaptiveDialogsOnBot}>
+                    Previsualización
+                </Button>
+            </Col>
+        </Row>
     );
 }

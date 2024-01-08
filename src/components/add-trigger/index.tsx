@@ -1,22 +1,24 @@
 "use client"
-import { Button, Form, Input, Select } from "@/components/antd"
+import { Button, Form, Input, Select, Title } from "@/components/antd"
 import { Dispatch, SetStateAction, useState } from "react";
-import { NewTrigger } from "../flow-tree";
+import { IAdaptiveDialog } from "../../interfaces/IAdaptiveDialog";
+
+export type NewTrigger = {
+    trigger: string,
+    intent: string
+}
 
 type AddTriggerComponentProps = {
-    setTriggerValue: Dispatch<SetStateAction<
-        {
-            trigger: string,
-            intent: string
-        }
-    >>
+    adaptiveDialog: IAdaptiveDialog
+    triggerCb: (data: NewTrigger) => void
 }
-export default function AddTriggerComponent({ setTriggerValue }: AddTriggerComponentProps) {
+export default function AddTriggerComponent({ adaptiveDialog, triggerCb }: AddTriggerComponentProps) {
     const [form] = Form.useForm();
-
-
+    form.resetFields()
+    
     const onFinish = (values: NewTrigger) => {
-        setTriggerValue(values)
+        triggerCb(values)
+        form.resetFields()
     };
 
     return (
@@ -25,6 +27,7 @@ export default function AddTriggerComponent({ setTriggerValue }: AddTriggerCompo
             form={form}
             onFinish={onFinish}
         >
+            <Title level={5}>Diálogo: {adaptiveDialog.id}</Title>
             <Form.Item
                 name="trigger"
                 label="Seleccionar disparador">
