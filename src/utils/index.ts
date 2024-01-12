@@ -61,6 +61,10 @@ export const parseToActions = (nodes: Action[], actions: Action[]) => {
                 actions.push(n.data)
             }
 
+            if (n.type === "Bada.SendHandoff") {
+                actions.push(n.data)
+            }
+
             if (n.type === "Bada.FunnelTag") {
                 actions.push(n.data)
             }
