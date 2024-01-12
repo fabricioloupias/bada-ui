@@ -10,8 +10,12 @@ const PopconfirmComponent = (props: any) => {
 
     return (
         <Popconfirm
-            {...restProps}
-            title={"Querés remover esta acción?"}
+            style={{
+                width: 180
+            }}
+            title={"Eliminar nodo"}
+            description={"Querés remover esta acción?"}
+            cancelText="Cancelar"
             onConfirm={() => {
                 removeNode(node);
                 onRemoveNodeSuccess?.(node);
