@@ -1,7 +1,7 @@
 "use client"
 
 import Script from "next/script"
-import { Button, Card, Col, Input, Modal, Row, Sider, Title } from "@/components/antd"
+import { Button, Card, Col, Flex, Input, Modal, Row, Sider, Text, Title } from "@/components/antd"
 import { useBoundStore } from "../../store"
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
@@ -65,7 +65,7 @@ export default function WebChat() {
         setDirectLine(createDirectLine({
             secret: '',
             token: '',
-            domain: botServiceUrl,
+            domain: `${botServiceUrl}`,
             webSocket: false
         } as any))
     }
@@ -87,11 +87,16 @@ export default function WebChat() {
                     position: 'fixed',
                     left: 200,
                     top: 0,
+                    borderInlineEnd: '1px solid rgba(5, 5, 5, 0.06)',
                     bottom: 0
                 }}
             >
-                <Row>
-                    <Col span={14}>
+                <Row
+                    style={{
+                        marginTop: 10
+                    }}
+                    justify="space-between">
+                    <Col span={10}>
                         <Title style={{
                             marginTop: 0
                         }} level={4}>Test chatbot</Title>
@@ -108,6 +113,7 @@ export default function WebChat() {
                         </Modal>
                     </Col>
                 </Row>
+
                 {botServiceUrl && directLine && store
                     ?
                     <>
@@ -125,7 +131,20 @@ export default function WebChat() {
                             />
                         </Card></>
                     :
-                    null
+                    <Flex gap="middle"
+                        style={{
+                            height: '90%'
+                        }}
+                        align="center" vertical>
+                        <Flex
+                            align="center"
+                            style={{
+                                height: '90%'
+                            }}
+                        >
+                            <Text>Conectate a un bot para ver webchat</Text>
+                        </Flex>
+                    </Flex>
                 }
             </Sider>
         )

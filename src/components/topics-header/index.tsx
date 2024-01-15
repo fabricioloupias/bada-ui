@@ -10,7 +10,7 @@ type TopicsHeaderProps = {
 export default function TopicsHeader({ botVersionId }: TopicsHeaderProps) {
     const {
         setVersionSelected,
-        setAdaptiveDialogsOnBot
+        setAdaptiveDialogsOnBot,
     } = useBoundStore((state) => state)
     const botVersionSelected = useBoundStore((state) => state.botVersionSelected)
 
@@ -27,7 +27,7 @@ export default function TopicsHeader({ botVersionId }: TopicsHeaderProps) {
     }
 
     const onSetAdaptiveDialogsOnBot = () => {
-        setAdaptiveDialogsOnBot()
+        setAdaptiveDialogsOnBot('http://localhost:3978')
     }
 
     return (

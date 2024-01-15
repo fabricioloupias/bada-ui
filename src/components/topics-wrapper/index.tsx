@@ -3,6 +3,7 @@ import TopicsHeader from "@/components/topics-header";
 
 import dynamic from 'next/dynamic'
 import { useState, useRef, useEffect } from "react";
+import { useBoundStore } from "../../store";
 const FlowTree = dynamic(() => import("@/components/flow-tree/index"), { ssr: false })
 
 type TopicsVersionWrapperProps = {
@@ -10,8 +11,9 @@ type TopicsVersionWrapperProps = {
 };
 
 export default function TopicsWrapper({ botVersionId }: TopicsVersionWrapperProps) {
-    const [parentHeight, setParentHeight] = useState<number>(0);
-    const elementRef = useRef(null);
+
+
+
 
     useEffect(() => {
     }, []);
@@ -23,7 +25,6 @@ export default function TopicsWrapper({ botVersionId }: TopicsVersionWrapperProp
             />
 
             <FlowTree
-                parentElementHeight={parentHeight}
                 botVersionId={botVersionId}
             />
         </>

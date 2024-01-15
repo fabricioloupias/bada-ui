@@ -25,7 +25,6 @@ const formatTrigger = (trigger: ITrigger) => {
 
 type FlowTreeProps = {
     botVersionId: string,
-    parentElementHeight: number
 };
 
 export type NewTrigger = {
@@ -33,7 +32,7 @@ export type NewTrigger = {
     intent: string
 }
 
-export default function FlowTree({ botVersionId, parentElementHeight }: FlowTreeProps) {
+export default function FlowTree({ botVersionId }: FlowTreeProps) {
     const {
         deepAdaptiveDialogs,
         getAdaptiveDialogs,
@@ -85,7 +84,7 @@ export default function FlowTree({ botVersionId, parentElementHeight }: FlowTree
 
     const generateData = (adaptiveDialogs: IAdaptiveDialog[]) => {
         const rootAdaptiveDialog = adaptiveDialogs.splice(0, 1)[0];
-        
+
         adaptiveDialogs = adaptiveDialogs.sort((a, b) => a.id.localeCompare(b.id))
         adaptiveDialogs.unshift(rootAdaptiveDialog);
 

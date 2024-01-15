@@ -28,7 +28,6 @@ export const createWebchatSlice: StateCreator<
     store: null,
     isWebchatOpen: false,
     setIsWebchatOpen: (isWebchatOpen: boolean) => {
-        console.log(isWebchatOpen)
         set({ isWebchatOpen: isWebchatOpen })
     }
 }), {

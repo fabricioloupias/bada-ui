@@ -9,14 +9,16 @@ import mongoose, { FlattenMaps } from "mongoose";
 import axios from "axios";
 
 type SetToBotDTO = {
-    adaptiveDialogIds: string[]
+    adaptiveDialogIds: string[],
+    urlBot: string
 }
 
 export async function POST(request: NextRequest) {
     try {
         await connectDB();
         const body = await request.json() as SetToBotDTO
-        const _ids = body.adaptiveDialogIds.map(id => new mongoose.Types.ObjectId(id))
+        const { urlBot, adaptiveDialogIds } = body
+        const _ids = adaptiveDialogIds.map(id => new mongoose.Types.ObjectId(id))
         const adaptiveDialogs: AdaptiveDialog[] = await AdaptiveDialogsModel.find({
             _id: _ids
         })
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
             toBot.push(adaptive)
         })
 
-        const response = await axios.post(`${process.env.BADA_HOST}/api/publish`, {
+        const response = await axios.post(`${urlBot}/api/publish`, {
             dialogs: toBot
         })
 
