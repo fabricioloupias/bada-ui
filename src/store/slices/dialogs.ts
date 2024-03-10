@@ -16,6 +16,8 @@ export interface DialogSlice {
     setAdaptiveDialogsOnBot: (urlBot: string) => Promise<void>
     updateAdaptiveDialog: (adaptiveDialog: IAdaptiveDialog) => Promise<void>
     deleteAdaptiveDialog: (adaptiveDialogId: string) => Promise<void>
+    exportVersion: () => Promise<void>
+
 }
 
 export const createDialoglice: StateCreator<
@@ -87,7 +89,7 @@ export const createDialoglice: StateCreator<
         })
 
         const data = await response.json()
-        return data.adaptive_dialog
+        return data
     },
     updateAdaptiveDialog: async (adaptiveDialog: IAdaptiveDialog) => {
         const response = await fetch('/api/adaptive-dialogs', {
@@ -111,5 +113,21 @@ export const createDialoglice: StateCreator<
         }
 
         throw new Error(data.message)
-    }
+    },
+    exportVersion: async () => {
+        const adaptiveDialogIds = get().adaptiveDialogs.map(a => a._id)
+
+        const response = await fetch('/api/adaptive-dialogs/export-version', {
+            method: 'POST',
+            body: JSON.stringify({
+                adaptiveDialogIds,
+            })
+        })
+
+        const data = await response.json()
+        console.log(JSON.stringify({
+            dialogs: data.data
+        }))
+        return data
+    },
 })

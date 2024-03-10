@@ -11,6 +11,7 @@ export default function TopicsHeader({ botVersionId }: TopicsHeaderProps) {
     const {
         setVersionSelected,
         setAdaptiveDialogsOnBot,
+        exportVersion
     } = useBoundStore((state) => state)
     const botVersionSelected = useBoundStore((state) => state.botVersionSelected)
 
@@ -37,6 +38,13 @@ export default function TopicsHeader({ botVersionId }: TopicsHeaderProps) {
                     marginTop: 0
                 }} level={3}>Temas de la versión: {botVersionSelected.version}
                 </Title>
+            </Col>
+            <Col span={4}>
+                <Button
+                    block
+                    onClick={exportVersion}>
+                    Exportar
+                </Button>
             </Col>
             <Col span={4}>
                 <Button
