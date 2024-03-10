@@ -2,6 +2,7 @@ import { StateCreator } from "zustand"
 import { BoundStoreType } from ".."
 import { IAdaptiveDialog } from "../../interfaces/IAdaptiveDialog"
 import { NewAdaptiveDialogDTO } from "../../app/api/adaptive-dialogs/route"
+import { checkEnvironment } from "@/utils/checkenvironment"
 
 export interface DialogSlice {
     adaptiveDialogs: IAdaptiveDialog[]
@@ -9,7 +10,7 @@ export interface DialogSlice {
         isLoading: boolean
         isError: boolean
     },
-    getAdaptiveDialogs: (botVersionId: string) => Promise<void>
+    getAdaptiveDialogs: (botVersionId: string) => Promise<IAdaptiveDialog[]>
     deepAdaptiveDialogs: IAdaptiveDialog[]
     setDeepAdaptiveDialogs: (adaptiveDialogs: IAdaptiveDialog[]) => void
     saveAdaptiveDialog: (newAdaptiveDialogDTO: NewAdaptiveDialogDTO) => Promise<IAdaptiveDialog>;
@@ -40,7 +41,7 @@ export const createDialoglice: StateCreator<
             }
         })
         try {
-            const response = await fetch(`/api/adaptive-dialogs?botVersionId=${botVersionId}`)
+            const response = await fetch(`${checkEnvironment()}/api/adaptive-dialogs?botVersionId=${botVersionId}`)
             const json = await response.json()
 
             set({
@@ -50,8 +51,9 @@ export const createDialoglice: StateCreator<
                 }
             })
 
-            set({ adaptiveDialogs: json.adaptive_dialogs })
-            set({ deepAdaptiveDialogs: json.adaptive_dialogs })
+            set({ adaptiveDialogs: json.adaptive_dialogs }) //TODO: sacar
+            set({ deepAdaptiveDialogs: json.adaptive_dialogs })//TODO: sacar
+            return json.adaptive_dialogs
         } catch (error) {
             console.error(error)
             set({
@@ -60,6 +62,7 @@ export const createDialoglice: StateCreator<
                     isError: true
                 }
             })
+            return []
         }
     },
     setDeepAdaptiveDialogs: (adaptiveDialogs: IAdaptiveDialog[]) => {

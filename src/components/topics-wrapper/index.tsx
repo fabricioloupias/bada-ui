@@ -1,32 +1,33 @@
-"use client"
 import TopicsHeader from "@/components/topics-header";
+import { useBoundStore } from "@/store";
 
 import dynamic from 'next/dynamic'
-import { useState, useRef, useEffect } from "react";
-import { useBoundStore } from "../../store";
 const FlowTree = dynamic(() => import("@/components/flow-tree/index"), { ssr: false })
 
 type TopicsVersionWrapperProps = {
     botVersionId: string
 };
 
-export default function TopicsWrapper({ botVersionId }: TopicsVersionWrapperProps) {
+export default async function TopicsWrapper({ botVersionId }: TopicsVersionWrapperProps) {
+    const {
+        getAdaptiveDialogs,
+    } = useBoundStore.getState()
 
-
-
-
-    useEffect(() => {
-    }, []);
-
+    const adaptiveDialogs = await getAdaptiveDialogs(botVersionId)
     return (
         <>
             <TopicsHeader
                 botVersionId={botVersionId}
             />
-
-            <FlowTree
-                botVersionId={botVersionId}
-            />
+            {adaptiveDialogs.length > 0
+                ?
+                <FlowTree
+                    botVersionId={botVersionId}
+                    adaptiveDialogs={adaptiveDialogs}
+                />
+                :
+                null
+            }
         </>
     );
 }

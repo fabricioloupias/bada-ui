@@ -11,6 +11,7 @@ import { ITrigger } from "../../interfaces/ITrigger";
 import { deleteTreeNode } from "./utils";
 import AddTriggerComponent from "../add-trigger";
 import AddTopicComponent from "../add-topic";
+import EditRootAdaptiveDialog from '../edit-root-adaptive-dialog';
 
 const formatTrigger = (trigger: ITrigger) => {
     switch (trigger.$kind) {
@@ -25,6 +26,7 @@ const formatTrigger = (trigger: ITrigger) => {
 
 type FlowTreeProps = {
     botVersionId: string,
+    adaptiveDialogs: IAdaptiveDialog[]
 };
 
 export type NewTrigger = {
@@ -32,19 +34,17 @@ export type NewTrigger = {
     intent: string
 }
 
-export default function FlowTree({ botVersionId }: FlowTreeProps) {
+export default function FlowTree({ botVersionId, adaptiveDialogs }: FlowTreeProps) {
     const {
-        deepAdaptiveDialogs,
         getAdaptiveDialogs,
         deleteTrigger,
         deleteAdaptiveDialog,
         saveTrigger,
-        setDeepAdaptiveDialogs,
         saveAdaptiveDialog
     } = useBoundStore((state) => state)
-
     const [defaultData, setDefaultData] = useState<EditableNode[]>([]);
     const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+    const [deepAdaptiveDialogs, setDeepAdaptiveDialogs] = useState<IAdaptiveDialog[]>([]);
     const [searchValue, setSearchValue] = useState('');
     const [autoExpandParent, setAutoExpandParent] = useState(true);
     const [triggerModalOptions, setTriggerModalOptions] = useState<{
@@ -61,6 +61,12 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
         openModalTopic: boolean,
     }>({
         openModalTopic: false,
+    });
+
+    const [rootEditModalOptions, setRootEditModalOptions] = useState<{
+        openModal: boolean,
+    }>({
+        openModal: false,
     });
 
     const showModalToTrigger = (adaptiveDialog: IAdaptiveDialog) => {
@@ -82,9 +88,15 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
         }))
     };
 
-    const generateData = (adaptiveDialogs: IAdaptiveDialog[]) => {
-        const rootAdaptiveDialog = adaptiveDialogs.splice(0, 1)[0];
+    const showModalToRootEdit = () => {
+        setRootEditModalOptions({
+            openModal: true
+        })
+    };
 
+    const generateData = (adaptiveDialogs: IAdaptiveDialog[]) => {
+        console.log("adaptiveDialogs", adaptiveDialogs)
+        const rootAdaptiveDialog = adaptiveDialogs.splice(0, 1)[0];
         adaptiveDialogs = adaptiveDialogs.sort((a, b) => a.id.localeCompare(b.id))
         adaptiveDialogs.unshift(rootAdaptiveDialog);
 
@@ -95,7 +107,6 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
 
             const data = adaptiveDialogs.map((adaptiveDialog, index) => {
                 countAdaptiveIndex = index
-                adaptiveDialog.triggers = adaptiveDialog.triggers ?? [];
                 let countIndex = 0
                 const children = adaptiveDialog.triggers.map((t, indexC: number) => {
                     countIndex = indexC
@@ -112,7 +123,7 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                 if (children.length > 0) {
                     countIndex++
                 }
-                const key = `${mainIndex}-${index}-${countIndex}`
+                let key = `${mainIndex}-${index}-${countIndex}`
                 expandedKeys.push(key)
                 children.push({
                     key,
@@ -125,6 +136,7 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                     type: "addTrigger"
                 } as EditableNode)
                 expandedKeys.push(`${mainIndex}-${index}`)
+                countIndex++
                 if (adaptiveDialog.id === "Root") {
                     return {
                         key: `${mainIndex}-${index}`,
@@ -162,7 +174,8 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                 </Button>),
                 type: "addAdaptiveDialog",
                 icon: <CarryOutOutlined />,
-                children: []
+                children: [],
+                id: ""
             } as EditableNode)
             setExpandedKeys(expandedKeys)
             // setTreeData(data)
@@ -252,6 +265,11 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
         }
     }
 
+    const onClickEditNode = async (nodeId: string) => {
+        console.log(nodeId)
+        showModalToRootEdit()
+    }
+
     const addTrigger = async (dialogId: string, triggerValue: NewTrigger) => {
         const newTrigger = {
             $kind: triggerValue.trigger,
@@ -306,6 +324,13 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
         }))
     }
 
+    const closeModalRootEdit = () => {
+        setRootEditModalOptions({
+            openModal: false,
+        })
+    }
+
+
     const triggerCb = (trigger: NewTrigger) => {
         addTrigger(triggerModalOptions.adaptiveDialogSelected!._id, trigger)
 
@@ -318,13 +343,10 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
         closeModalTopic()
     }
 
-    useEffect(() => {
-        getAdaptiveDialogs(botVersionId)
-    }, [])
 
     useEffect(() => {
-        generateData(deepAdaptiveDialogs)
-    }, [deepAdaptiveDialogs])
+        generateData(adaptiveDialogs)
+    }, [adaptiveDialogs])
 
     return (
         defaultData.length > 0
@@ -342,13 +364,13 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                     titleRender={(node: any) => (
                         <EditableTreeTitle
                             onClickDeleteNode={onClickDeleteNode}
+                            onClickEditNode={onClickEditNode}
                             node={node}
                         />
                     )}
                     autoExpandParent={autoExpandParent}
                     treeData={treeData}
                 />
-
                 <Modal
                     title={`Agregar trigger`}
                     footer={null}
@@ -371,6 +393,16 @@ export default function FlowTree({ botVersionId }: FlowTreeProps) {
                     <AddTopicComponent
                         topicCb={topicCb}
                     />
+                </Modal>
+
+                <Modal
+                    title={`Editar Root`}
+                    afterClose={closeModalRootEdit}
+                    footer={null}
+                    onCancel={closeModalRootEdit}
+                    open={rootEditModalOptions.openModal}
+                >
+                    <EditRootAdaptiveDialog adaptiveDialog={adaptiveDialogs[0]} />
                 </Modal>
             </>
             : null

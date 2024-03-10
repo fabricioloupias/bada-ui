@@ -1,16 +1,17 @@
 import { Space, Tooltip } from "antd";
 import React, { } from "react";
 import { DataNode } from "antd/es/tree";
-import { Delete12Filled } from "@fluentui/react-icons";
+import { Delete16Filled, BoxEditFilled, Edit16Filled } from "@fluentui/react-icons";
 
 export interface EditableNode extends DataNode {
     type?: "addAdaptiveDialog" | "addTrigger" | "trigger" | "adaptiveDialog"
-    id?: string
+    id: string
 }
 
 type EditableTreeTitleProps = {
     node: EditableNode;
     onClickDeleteNode: (node: EditableNode) => void
+    onClickEditNode: (node: string) => void
 };
 
 export type TEditableTreeTitle = Omit<
@@ -20,7 +21,8 @@ export type TEditableTreeTitle = Omit<
 
 export const EditableTreeTitle = ({
     node,
-    onClickDeleteNode
+    onClickDeleteNode,
+    onClickEditNode
 }: EditableTreeTitleProps) => {
 
 
@@ -41,8 +43,21 @@ export const EditableTreeTitle = ({
                 }}
                 size={[6, 0]}
                 wrap>
+                {
+                    node.key === "0-0"
+                        ?
+                        <Tooltip title="Editar">
+                            <Edit16Filled
+                                onClick={() => {
+                                    onClickEditNode(node.id)
+                                }} />
+                        </Tooltip>
+
+                        :
+                        null
+                }
                 <Tooltip title="Eliminar">
-                    <Delete12Filled
+                    <Delete16Filled
                         onClick={() => {
                             onClickDeleteNode(node)
                         }} />
