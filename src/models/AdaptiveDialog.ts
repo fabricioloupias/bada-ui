@@ -37,5 +37,16 @@ const adaptiveDialogSchema = new Schema<AdaptiveDialog>({
 })
 
 const AdaptiveDialogsModel = models.AdaptiveDialog || model<AdaptiveDialog>('AdaptiveDialog', adaptiveDialogSchema);
+const createEmptyAdaptiveDialog = (botVersionId: string) => {
+    return {
+        botVersionId,
+        $kind: "Microsoft.AdaptiveDialog",
+        id: "Root",
+        recognizer: {
+            $kind: "Microsof.RecognizerSet",
+            recognizers: []
+        }
+    }
+} 
 
-export { AdaptiveDialogsModel };
+export { AdaptiveDialogsModel, createEmptyAdaptiveDialog };

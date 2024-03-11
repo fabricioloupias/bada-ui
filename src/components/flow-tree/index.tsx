@@ -345,8 +345,9 @@ export default function FlowTree({ botVersionId, adaptiveDialogs }: FlowTreeProp
 
 
     useEffect(() => {
+        setDeepAdaptiveDialogs(adaptiveDialogs)
         generateData(adaptiveDialogs)
-    }, [adaptiveDialogs])
+    }, [deepAdaptiveDialogs])
 
     return (
         defaultData.length > 0

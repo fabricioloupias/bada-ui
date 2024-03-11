@@ -54,7 +54,7 @@ export type NewAdaptiveDialogDTO = {
     id: string
 }
 
-// crear adaptive dialog para adaptive dialog Id
+// crear adaptive dialog para bot version Id
 export async function POST(request: NextRequest) {
     try {
         await connectDB();
@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
         const adaptiveDialog = await AdaptiveDialogsModel.create({
             botVersionId: new mongoose.mongo.ObjectId(body.botVersionId),
             $kind: "Microsoft.AdaptiveDialog",
+            triggers: [],
             id: body.id
         })
 

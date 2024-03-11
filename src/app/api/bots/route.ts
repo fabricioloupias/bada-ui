@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createErrorResponse } from "../../../lib/utils";
 import connectDB from "../../../lib/connect-db";
 import { Bot, BotModel } from "../../../models/Bot";
-import { AdaptiveDialog, AdaptiveDialogsModel } from "../../../models/AdaptiveDialog";
+import { AdaptiveDialog, AdaptiveDialogsModel, createEmptyAdaptiveDialog } from "../../../models/AdaptiveDialog";
 import { BotVersion, BotVersionModel } from "../../../models/BotVersion";
 import { VersionCounter, VersionCounterModel } from "../../../models/VersionCounter";
 import { HydratedDocument } from "mongoose";
@@ -45,12 +45,14 @@ export async function POST(request: NextRequest) {
         const newBot: HydratedDocument<Bot> = new BotModel(body)
         await newBot.save()
 
+        const date = new Date()
         const botVersion: HydratedDocument<BotVersion> = new BotVersionModel({
             version: 0,
             botId: newBot._id,
             publishedBy: "Sistema",
+            publishedAt: date, 
             createdBy: "Sistema",
-            isDraft: true
+            isDraft: false
         })
         await botVersion.save();
 
@@ -60,14 +62,8 @@ export async function POST(request: NextRequest) {
         })
         await versionCounter.save()
 
-        const adaptiveDialog: HydratedDocument<AdaptiveDialog> = new AdaptiveDialogsModel({
-            botVersionId: botVersion._id,
-            $kind: "Microsoft.AdaptiveDialog",
-            id: "Root",
-            recognizer: {
-                $kind: "Bada.MCRecognizer",
-            }
-        })
+        const emptyAdaptiveDialog = createEmptyAdaptiveDialog(botVersion._id)
+        const adaptiveDialog: HydratedDocument<AdaptiveDialog> = new AdaptiveDialogsModel(emptyAdaptiveDialog)
         await adaptiveDialog.save()
 
         let json_response = {

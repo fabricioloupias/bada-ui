@@ -3,7 +3,7 @@ import { createErrorResponse } from "../../../lib/utils";
 import connectDB from "../../../lib/connect-db";
 import { BotVersionModel } from "../../../models/BotVersion";
 import { VersionCounterModel } from "../../../models/VersionCounter";
-import { AdaptiveDialogsModel } from "../../../models/AdaptiveDialog";
+import { AdaptiveDialogsModel, createEmptyAdaptiveDialog } from "../../../models/AdaptiveDialog";
 import mongoose from "mongoose";
 
 export async function GET(request: NextRequest) {
@@ -63,20 +63,14 @@ export async function POST(request: NextRequest) {
         if (versionCounter) {
             const newCount = versionCounter.counter + 1
             const data = await BotVersionModel.create({
-                botId: body.botId,
+                botId: new mongoose.Types.ObjectId(body.botId),
                 isDraft: true,
-                createdBy: body.userId,
+                createdBy: body.userId, // TODO: modificar cuando este el object id
                 version: newCount
             })
 
-            await AdaptiveDialogsModel.create({
-                botVersionId: data._id,
-                id: "Root",
-                $kind: "Microsoft.AdaptiveDialog",
-                recognizer: {
-                    $kind: "Bada.MCRecognizer",
-                }
-            })
+            const emptyAdaptiveDialog = createEmptyAdaptiveDialog(data._id)
+            await AdaptiveDialogsModel.create(emptyAdaptiveDialog)
 
             versionCounter.counter++
             await versionCounter.save()

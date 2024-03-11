@@ -41,7 +41,9 @@ export const createDialoglice: StateCreator<
             }
         })
         try {
-            const response = await fetch(`${checkEnvironment()}/api/adaptive-dialogs?botVersionId=${botVersionId}`)
+            const response = await fetch(`${checkEnvironment()}/api/adaptive-dialogs?botVersionId=${botVersionId}`, {
+                cache: "no-store",
+            })
             const json = await response.json()
 
             set({

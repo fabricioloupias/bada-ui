@@ -54,14 +54,13 @@ export const EditableTreeTitle = ({
                         </Tooltip>
 
                         :
-                        null
+                        <Tooltip title="Eliminar">
+                            <Delete16Filled
+                                onClick={() => {
+                                    onClickDeleteNode(node)
+                                }} />
+                        </Tooltip>
                 }
-                <Tooltip title="Eliminar">
-                    <Delete16Filled
-                        onClick={() => {
-                            onClickDeleteNode(node)
-                        }} />
-                </Tooltip>
             </Space>
         </>
     );

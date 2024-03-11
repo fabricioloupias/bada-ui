@@ -24,7 +24,7 @@ const botVersionSchema = new Schema<BotVersion>({
         required: true
     },
     publishedAt: {
-        type: String,
+        type: Schema.Types.Date,
         required: false
     },
     version: {

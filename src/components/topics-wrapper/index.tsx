@@ -1,6 +1,6 @@
 import TopicsHeader from "@/components/topics-header";
 import { useBoundStore } from "@/store";
-
+export const revalidate = 0
 import dynamic from 'next/dynamic'
 const FlowTree = dynamic(() => import("@/components/flow-tree/index"), { ssr: false })
 

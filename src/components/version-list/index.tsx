@@ -47,7 +47,7 @@ export default function VersionList({ botId }: VersionListProps) {
         },
         {
             title: 'Fecha publicacion',
-            dataIndex: 'createdAt',
+            dataIndex: 'publishedAt',
         },
         {
             title: 'Publicar',

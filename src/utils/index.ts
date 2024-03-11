@@ -1,4 +1,6 @@
 import { Action } from "@/models/Action"
+export { checkEnvironment } from "./checkenvironment"
+export { recognizerTypes } from "./recognizerTypes"
 
 export const parseToActions = (nodes: Action[], actions: Action[]) => {
     nodes.forEach((n: Action) => {
