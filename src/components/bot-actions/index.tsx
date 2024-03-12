@@ -4,8 +4,12 @@ import { DeleteOutlined, PlusOutlined, VerticalAlignBottomOutlined, VerticalAlig
 import { useState } from 'react';
 import { Bot } from '../../models/Bot';
 import { Alert } from 'antd';
+import { useBoundStore } from '@/store';
 
 export default function BotsActions() {
+    const {
+        getBots
+    } = useBoundStore((state) => state)
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [formNewChatbot] = Form.useForm();
@@ -13,18 +17,21 @@ export default function BotsActions() {
     const [showSpin, setShowSpin] = useState<boolean>(false)
     const [showAlertNewBotSuccess, setShowAlertNewBotSuccess] = useState<boolean>(false)
 
-    const showModal = () => {
+    const showModalNewBot = () => {
+        formNewChatbot.resetFields()
+        setShowAlertNewBotSuccess(false)
         setOpen(true);
     };
 
-    const handleOk = async () => {
+    const handleOkNewBot = async () => {
         setShowSpin(true)
         try {
-            const response = await fetch(`/api/bots`, {
+            await fetch(`/api/bots`, {
                 method: 'POST',
                 body: JSON.stringify(chatBot),
             })
             setShowAlertNewBotSuccess(true)
+            getBots()
         } catch (error) {
             console.error(error)
         }
@@ -43,7 +50,7 @@ export default function BotsActions() {
         <Space wrap>
             <Button
                 type="text"
-                onClick={showModal}
+                onClick={showModalNewBot}
                 icon={<PlusOutlined />}
             >
                 Nuevo chatbot
@@ -51,7 +58,7 @@ export default function BotsActions() {
             <Modal
                 title="Crear nuevo chatbot"
                 open={open}
-                onOk={handleOk}
+                onOk={handleOkNewBot}
                 confirmLoading={confirmLoading}
                 onCancel={handleCancel}
             >
@@ -61,7 +68,10 @@ export default function BotsActions() {
                     <Form
                         layout="vertical"
                         form={formNewChatbot}
-                        initialValues={chatBot}
+                        initialValues={{
+                            name: "",
+                            type: ""
+                        }}
                         onValuesChange={onFormNewChatbotChange}
                     >
                         <Form.Item

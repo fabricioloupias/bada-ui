@@ -1,6 +1,7 @@
 import { StateCreator } from "zustand"
 import { BoundStoreType } from ".."
 import { IBot } from "../../interfaces/IBot"
+import { checkEnvironment } from "@/utils"
 
 export interface BotSlice {
     bots: IBot[]
@@ -12,7 +13,7 @@ export interface BotSlice {
     setBots: (bots: IBot[]) => void
     setBotSelected: (botId: string) => void
     getBotSelected: () => IBot | null
-    getBots: () => Promise<void>
+    getBots: () => Promise<IBot[]>
 }
 
 export const createBotSlice: StateCreator<
@@ -38,7 +39,9 @@ export const createBotSlice: StateCreator<
             }
         })
         try {
-            const response = await fetch('/api/bots')
+            const response = await fetch(`${checkEnvironment()}/api/bots`, {
+                cache: "no-store",
+            })
             const data = await response.json()
             set({
                 statusFetchingBots: {
@@ -47,6 +50,8 @@ export const createBotSlice: StateCreator<
                 }
             })
             set({ bots: data.bots })
+
+            return data.bots
 
         } catch (error) {
             console.error(error)

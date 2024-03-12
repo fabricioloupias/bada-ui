@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import BotActions from '@/components/bot-actions'
 const BotList = dynamic(() => import("@/components/bot-list"), { ssr: false })
 
-function BotsPage() {
+async function BotsPage() {
     return (
         <>
             <Header

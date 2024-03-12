@@ -5,6 +5,7 @@ import { useBoundStore } from '@/store';
 import { useEffect } from 'react';
 import mongoose from 'mongoose';
 import Link from 'next/link';
+import { IBot } from '@/interfaces/IBot';
 
 const getColorTag = (type: string) => {
     let color = "";
@@ -22,13 +23,17 @@ const getColorTag = (type: string) => {
     return color;
 }
 
+type BotListProps = {
+};
 
 export default function BotList() {
-    const bots = useBoundStore((state) => state.bots)
+    const {
+        bots,
+        getBots
+    } = useBoundStore((state) => state)
     const botSelected = useBoundStore((state) => state.botSelected)
     const setBotSelected = useBoundStore((state) => state.setBotSelected)
     const statusFetchingBots = useBoundStore((state) => state.statusFetchingBots)
-    const getBots = useBoundStore((state) => state.getBots)
 
     const selectBot = (id: string) => {
         setBotSelected(id)
