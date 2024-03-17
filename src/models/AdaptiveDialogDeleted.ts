@@ -18,6 +18,6 @@ const adaptiveDialogDeletedSchema = new Schema<AdaptiveDialogDeleted>({
     timestamps: true
 })
 
-const AdaptiveDialogDeletedModel = models.AdaptiveDialogDeleted || model<AdaptiveDialogDeleted>('AdaptiveDialogDeleted', adaptiveDialogDeletedSchema);
+const AdaptiveDialogDeletedModel = models.AdaptiveDialogDeletedModel || model<AdaptiveDialogDeleted>('AdaptiveDialogDeletedModel', adaptiveDialogDeletedSchema);
 
 export { AdaptiveDialogDeletedModel };

@@ -26,6 +26,6 @@ const botSchema = new Schema<Bot>({
     timestamps: true
 })
 
-const BotModel = models.Bot || model<Bot>('Bot', botSchema);
+const BotModel = models.BotModel || model<Bot>('BotModel', botSchema);
 
 export { BotModel };

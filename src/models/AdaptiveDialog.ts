@@ -6,7 +6,7 @@ export interface AdaptiveDialog extends Document {
     _id: Types.ObjectId
     $kind: string
     id: string
-    triggers?: Trigger[]
+    triggers: Trigger[]
     botVersionId: Types.ObjectId
     recognizer?: any //TODO: modificar el type
 }
@@ -24,7 +24,6 @@ const adaptiveDialogSchema = new Schema<AdaptiveDialog>({
     botVersionId: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'BotVersion'
     },
     recognizer: {
         type: Schema.Types.Mixed,
@@ -36,7 +35,7 @@ const adaptiveDialogSchema = new Schema<AdaptiveDialog>({
     timestamps: true
 })
 
-const AdaptiveDialogsModel = models.AdaptiveDialog || model<AdaptiveDialog>('AdaptiveDialog', adaptiveDialogSchema);
+const AdaptiveDialogsModel = models.AdaptiveDialogsModel || model<AdaptiveDialog>('AdaptiveDialogsModel', adaptiveDialogSchema);
 const createEmptyAdaptiveDialog = (botVersionId: string) => {
     return {
         botVersionId,

@@ -54,6 +54,6 @@ const actionSchema = new Schema<Action>({
     timestamps: true
 });
 
-const ActionModel = models.Action || model<Action>('Action', actionSchema);
+const ActionModel = models.ActionModel || model<Action>('ActionModel', actionSchema);
 
 export { ActionModel }

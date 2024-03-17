@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createErrorResponse } from "../../../lib/utils";
 import connectDB from "../../../lib/connect-db";
-import { Bot, BotModel } from "../../../models/Bot";
-import { AdaptiveDialog, AdaptiveDialogsModel, createEmptyAdaptiveDialog } from "../../../models/AdaptiveDialog";
-import { BotVersion, BotVersionModel } from "../../../models/BotVersion";
-import { VersionCounter, VersionCounterModel } from "../../../models/VersionCounter";
-import { HydratedDocument } from "mongoose";
+import { BotVersionModel } from "@/models/BotVersion";
+import { VersionCounterModel } from "@/models/VersionCounter";
+import { AdaptiveDialogsModel, createEmptyAdaptiveDialog } from "@/models/AdaptiveDialog";
+import { BotModel } from "@/models/Bot";
 
 export async function GET(request: NextRequest) {
     try {
@@ -42,28 +41,28 @@ export async function POST(request: NextRequest) {
         await connectDB();
         const body = await request.json()
         body.owner = 'No identificado'
-        const newBot: HydratedDocument<Bot> = new BotModel(body)
+        const newBot = new BotModel(body)
         await newBot.save()
 
         const date = new Date()
-        const botVersion: HydratedDocument<BotVersion> = new BotVersionModel({
+        const botVersion = new BotVersionModel({
             version: 0,
             botId: newBot._id,
             publishedBy: "Sistema",
-            publishedAt: date, 
+            publishedAt: date,
             createdBy: "Sistema",
             isDraft: false
         })
         await botVersion.save();
 
-        const versionCounter: HydratedDocument<VersionCounter> = new VersionCounterModel({
+        const versionCounter = new VersionCounterModel({
             botId: newBot._id,
             counter: 0
         })
         await versionCounter.save()
 
         const emptyAdaptiveDialog = createEmptyAdaptiveDialog(botVersion._id)
-        const adaptiveDialog: HydratedDocument<AdaptiveDialog> = new AdaptiveDialogsModel(emptyAdaptiveDialog)
+        const adaptiveDialog = new AdaptiveDialogsModel(emptyAdaptiveDialog)
         await adaptiveDialog.save()
 
         let json_response = {

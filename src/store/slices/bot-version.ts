@@ -12,7 +12,7 @@ export interface BotVersionSlice {
     botVersionSelected: IBotVersion | null
     setVersionSelected: (version: string) => Promise<void>
     getBotVersions: (botId: string) => Promise<void>
-    createVersion: (botId: string) => Promise<void>
+    createVersion: (botId: string, fromVersionId: string) => Promise<void>
 }
 
 export const createBotVersionSlice: StateCreator<
@@ -69,24 +69,14 @@ export const createBotVersionSlice: StateCreator<
             }
         }
     },
-    createVersion: async (botId: string) => {
-        // const botVersions = get().botVersions.sort((a, b) => a.version - b.version);
-        // console.log(botVersions)
-        // const newVersion = {
-        //     _id: uuidV4(),
-        //     botId: botVersionSelected!._id!,
-        //     isDraft: true,
-        //     version: 999999,
-        //     adaptiveDialogs: [],
-        // }
-        // set((state) => ({ botVersions: [...state.botVersions, newVersion] }))
-
+    createVersion: async (botId: string, fromVersionId: string) => {
         try {
            await fetch(`/api/bot-versions`, {
                 method: 'post',
                 body: JSON.stringify({
                     botId,
-                    userId: 'cliente'
+                    userId: 'cliente',
+                    fromVersionId
                 })
             })
 

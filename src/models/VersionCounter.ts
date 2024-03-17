@@ -20,6 +20,6 @@ const versionCounterSchema = new Schema<VersionCounter>({
     timestamps: true
 })
 
-const VersionCounterModel = models.VersionCounter || model<VersionCounter>('VersionCounter', versionCounterSchema);
+const VersionCounterModel = models.VersionCounterModel || model<VersionCounter>('VersionCounterModel', versionCounterSchema);
 
 export { VersionCounterModel };

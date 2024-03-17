@@ -1,4 +1,4 @@
-import { Schema, Types, model, models, Document } from "mongoose";
+import { Schema, Types, model, Document, models } from "mongoose";
 
 export interface BotVersion extends Document {
     botId: Types.ObjectId
@@ -40,6 +40,6 @@ const botVersionSchema = new Schema<BotVersion>({
     timestamps: true
 })
 
-const BotVersionModel = models.BotVersion || model<BotVersion>('BotVersion', botVersionSchema,);
+const BotVersionModel = models.BotVersionModel || model<BotVersion>('BotVersionModel', botVersionSchema);
 
 export { BotVersionModel };

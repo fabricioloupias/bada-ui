@@ -28,6 +28,6 @@ const triggerSchema = new Schema<Trigger>({
     timestamps: true
 })
 
-const TriggerModel = models.Trigger || model<Trigger>('Trigger', triggerSchema);
+const TriggerModel = models.TriggerModel || model<Trigger>('TriggerModel', triggerSchema);
 
 export { TriggerModel };

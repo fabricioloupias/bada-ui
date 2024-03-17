@@ -2,7 +2,7 @@ import { IBot } from "./IBot";
 import { IAdaptiveDialog } from "./IAdaptiveDialog";
 
 export interface IBotVersion {
-    _id?: string
+    _id: string
     botId: string
     publishedBy?: string
     publishedAt?: string

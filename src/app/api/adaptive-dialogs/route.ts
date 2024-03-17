@@ -63,7 +63,6 @@ export async function POST(request: NextRequest) {
         const adaptiveDialog = await AdaptiveDialogsModel.create({
             botVersionId: new mongoose.mongo.ObjectId(body.botVersionId),
             $kind: "Microsoft.AdaptiveDialog",
-            triggers: [],
             id: body.id
         })
 
