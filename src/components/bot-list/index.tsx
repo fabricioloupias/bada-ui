@@ -24,12 +24,11 @@ const getColorTag = (type: string) => {
 }
 
 type BotListProps = {
+    bots: IBot[]
 };
 
-export default function BotList() {
+export default function BotList({ bots }: BotListProps) {
     const {
-        bots,
-        getBots
     } = useBoundStore((state) => state)
     const botSelected = useBoundStore((state) => state.botSelected)
     const setBotSelected = useBoundStore((state) => state.setBotSelected)
@@ -40,26 +39,10 @@ export default function BotList() {
         // setFlows(id)
     }
 
-    useEffect(() => {
-        getBots()
-    }, [getBots])
-
     const columns: ColumnsType<any> = [
         {
             title: 'Nombre',
             dataIndex: 'name',
-        },
-        {
-            title: 'Tipo',
-            dataIndex: 'type',
-            render: (_, { type, name, _id }) => (
-                <Tag
-                    key={`tag${_id}`}
-                    color={getColorTag(type)}
-                >
-                    {type.toUpperCase()}
-                </Tag>
-            )
         },
         {
             title: 'Dueño',

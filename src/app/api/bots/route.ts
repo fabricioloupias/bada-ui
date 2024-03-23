@@ -71,6 +71,6 @@ export async function POST(request: NextRequest) {
         };
         return NextResponse.json(json_response);
     } catch (error: any) {
-        return createErrorResponse(error.message, 500);
+        return createErrorResponse(error.message, 400);
     }
 }

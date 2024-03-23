@@ -5,15 +5,17 @@ import { useState } from 'react';
 import { Bot } from '../../models/Bot';
 import { Alert } from 'antd';
 import { useBoundStore } from '@/store';
+import { IBot } from '@/interfaces/IBot';
 
 export default function BotsActions() {
     const {
-        getBots
+        getBots,
+        createBot
     } = useBoundStore((state) => state)
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [formNewChatbot] = Form.useForm();
-    const [chatBot, setChatBot] = useState<Bot>();
+    const [chatBot, setChatBot] = useState<IBot>();
     const [showSpin, setShowSpin] = useState<boolean>(false)
     const [showAlertNewBotSuccess, setShowAlertNewBotSuccess] = useState<boolean>(false)
 
@@ -26,12 +28,11 @@ export default function BotsActions() {
     const handleOkNewBot = async () => {
         setShowSpin(true)
         try {
-            await fetch(`/api/bots`, {
-                method: 'POST',
-                body: JSON.stringify(chatBot),
-            })
-            setShowAlertNewBotSuccess(true)
-            getBots()
+            if (chatBot) {
+                await createBot(chatBot)
+                setShowAlertNewBotSuccess(true)
+                getBots()
+            }
         } catch (error) {
             console.error(error)
         }
@@ -42,7 +43,7 @@ export default function BotsActions() {
         setOpen(false);
     };
 
-    const onFormNewChatbotChange = (bot: Bot) => {
+    const onFormNewChatbotChange = (bot: IBot) => {
         setChatBot({ ...chatBot, ...bot });
     };
 
@@ -78,17 +79,6 @@ export default function BotsActions() {
                             name="name"
                             label="Nombre para el bot">
                             <Input placeholder="Bot2C, test_bot, Prueba bot..." />
-                        </Form.Item>
-                        <Form.Item
-                            name="type"
-                            label="Tipo"
-                        >
-                            <Select
-                            >
-                                <Select.Option value="Producción">Producción</Select.Option>
-                                <Select.Option value="Certificación">Certificación</Select.Option>
-                                <Select.Option value="Desarrollo">Desarrollo</Select.Option>
-                            </Select>
                         </Form.Item>
                     </Form>
                     {showAlertNewBotSuccess

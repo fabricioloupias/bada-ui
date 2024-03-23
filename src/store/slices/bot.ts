@@ -14,6 +14,7 @@ export interface BotSlice {
     setBotSelected: (botId: string) => void
     getBotSelected: () => IBot | null
     getBots: () => Promise<IBot[]>
+    createBot: (bot: IBot) => Promise<void>
 }
 
 export const createBotSlice: StateCreator<
@@ -73,4 +74,14 @@ export const createBotSlice: StateCreator<
         console.log('state', get().botSelected)
         return get().botSelected
     },
+    createBot: async (bot: IBot) => {
+        const response = await fetch(`${checkEnvironment()}/api/bots`, {
+            method: 'POST',
+            body: JSON.stringify(bot),
+        })
+
+        if (!response.ok) {
+            throw new Error("Error al crear bot")
+        }
+    }
 })

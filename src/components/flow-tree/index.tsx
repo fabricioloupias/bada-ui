@@ -301,6 +301,7 @@ export default function FlowTree({ botVersionId, adaptiveDialogs }: FlowTreeProp
                 botVersionId,
                 id: topicIdValue
             })
+            getAdaptiveDialogs(botVersionId)
             deepAdaptiveDialogs.push(adaptiveDialog)
             generateData(deepAdaptiveDialogs)
             setDeepAdaptiveDialogs(deepAdaptiveDialogs)

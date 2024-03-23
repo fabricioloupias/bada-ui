@@ -1,4 +1,4 @@
-import { Layout, Content, Header } from '@/components/antd'
+import { Layout, Content } from '@/components/antd'
 import { ReactNode } from 'react';
 
 type BotsLayoutProps = {

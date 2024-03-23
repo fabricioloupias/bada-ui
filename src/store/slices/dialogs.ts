@@ -79,6 +79,10 @@ export const createDialoglice: StateCreator<
             })
         })
 
+        if (!response.ok) {
+            throw new Error("Error al crear adaptive dialog")
+        }
+
         const data = await response.json()
         return data.adaptive_dialog
     },

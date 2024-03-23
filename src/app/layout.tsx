@@ -4,8 +4,7 @@ import type { Metadata } from 'next'
 import { ReactNode } from 'react';
 import dynamic from 'next/dynamic'
 import MenuHeader from '../components/menu-header';
-
-const MenuRoot = dynamic(() => import("@/components/menu-root"), { ssr: false })
+import MenuRoot from '@/components/menu-root';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
